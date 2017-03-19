@@ -1,12 +1,24 @@
-plot_all_stages <- function(ogroup, dset, ylab = "normalized expression", clusters = "cls_here")
-{
-    ### This function takes an orthogroup ID and the expression matrix
-    ### It plots a stripchart of the expression of all the stages
-    ### The title of the stripchart contains details on:
-    ### - n of genes in the orthogroup
-    ### - The cluster that contain the ogroup (if any)
-    ### . The F-value for the interaction term
+#' Plot the Expression of One Orthogroup in Both Species
+#'
+#' \code{plot_all_stages} is a wrapper for \code{stripchart} and plots a stripchart
+#' and a line plot of the expression of an orthogroup across all samples
+#'
+#' This function takes an orthogroup ID and the expression matrix.
+#' It plots a stripchart of the expression of all the stages; The title of the
+#' stripchart contains details on: how many genes are in the orthogroup, the cluster
+#' that contain the ogroup (if any), the F-value for the interaction term.
+#'
+#' @param ogroup a character string
+#' @param dset a numeric data.frame with ogroups as rownames
+#' @param ylab a character string
+#' @param clusters a named numeric vector
 
+
+plot_all_stages <- function(ogroup,
+                            dset,
+                            ylab = "normalized expression",
+                            clusters = "cls_here")
+{
     # old <- par()
     # on.exit(par(old), add = TRUE)
     par(mar = c(5, 4, 8, 2))
@@ -50,10 +62,16 @@ plot_all_stages <- function(ogroup, dset, ylab = "normalized expression", cluste
     legend("topright", legend = c("C3", "C4"), lty = c(2, 3), bty = "n")
 }
 
+#' plot the expression of all genes within one orthogroup
+#'
+#' \code{plot_og_gene} is a wrapper for \code{stripchart} and plots a stripchart
+#' of the expression of all the gene within a orthogroup for each species in which
+#' expression data are available
+#'
+#' @param ogroup a character string
+
 plot_og_genes <- function(ogroup)
 {
-    ### This function takes an orthogroup as an input and
-    ### plots all the genes in that orthogroup
     ### There is an dicrepancy between ids in ogroups and expression matrix
     genes <- og[[ogroup]]
     print(genes)
@@ -82,11 +100,21 @@ plot_og_genes <- function(ogroup)
     # plot_gene(genes[1])
 }
 
+#' Plot the Expression of Every Orthogroup that Contains a Keyword in their Annos
+#'
+#' \code{plot_keyword} is a wrapper for \code{\link{plot_all_stages}} that applies this
+#' function to all the orthogroups in the dataset that contain a user specified keyword
+#' in their functional annotation
+#'
+#' The function uses grep to search for the \code{keyword} in the functional annotation
+#' of the orthogroups
+#'
+#' @param keyword a character string
+#' @inheritParams plot_all_stages
+
 plot_keyword <- function(keyword, dset, clusters)
 {
-    ### This is a wrapper for plot_all_stages
-    ### It takes a keyword as input and plot all orthogroups
-    ### That contain this word in the functional annotation
+
     to_plot <- rownames(dset[grep(keyword, dat_fit_log$annos_th), ])
     sapply(to_plot, plot_all_stages, dset = dset, clusters = clusters)
 }
