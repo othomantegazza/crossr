@@ -1,0 +1,8 @@
+plot_keyword <- function(keyword, dset, clusters)
+{
+### This is a wrapper for plot_all_stages
+### It takes a keyword as input and plot all orthogroups
+### That contain this word in the functional annotation
+to_plot <- rownames(dset[grep(keyword, dat_fit_log$annos_th), ])
+sapply(to_plot, plot_all_stages, dset = dset, clusters = clusters)
+}

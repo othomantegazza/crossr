@@ -1,8 +1,14 @@
 Package: crossr
-Title: What the Package Does (one line, title case)
+Title: Functions for Cross-species Quantitative Transcriptomics
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Otho", "Mantegazza",
+				  email = "otho [dot] mantegazza [at] gmail [dot] com",
+				  role = c("aut", "cre"))
+Description: Functions that constitute a simple workflow for cross species transcriptomic
+	comparison. The required input are expression matrix (we suggest to use TPM produced 
+	with a pseudoaligner) and orthogroups (we suggest to use orthofinder) The function
+	implement a simple linear model based workflow in order to select genes that behave
+	differently among species.
 Depends: R (>= 3.3.3)
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
