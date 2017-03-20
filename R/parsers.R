@@ -11,6 +11,8 @@ get_TPM <- function(path) {
     return(TPM)
 }
 
+
+
 #' Parse and Load an Orthogroup File Provided by Orthofinder
 #'
 #' \code{parse_orthogroups} parses an orthogroup file provided by Orthofinder and
@@ -30,7 +32,7 @@ parse_orthogroups <- function(path_2_ogroups)
                         orthogroups)
 
     ### why are GG identifiers different in mRNA and proteins
-    ### convert from CgyXXXXX to CgXXXXX  ##This is error prone
+    ### convert from CgyXXXXX to CgXXXXX  ##This might be prone
     orthogroups <- gsub("y", "",
                         orthogroups)
     orthogroups <- strsplit(orthogroups, ", ")
