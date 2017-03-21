@@ -1,16 +1,11 @@
-require(devtools)
-require(testthat)
-
-devtools::load_all("~/Google Drive/Cross_species_comparison/crossr")
-
 context("parse quant.sf files")
 
 test_that("output of get_TPM is a 1 numeric column data.frame", {
-    expect_equal(class(get_TPM("data/quant.sf")), "data.frame")
-    expect_equal(ncol(get_TPM("data/quant.sf")), 1)
-    expect_equal(class(get_TPM("data/quant.sf")$TPM), "numeric")
+    expect_equal(class(get_TPM("../../inst/exdata/quant.sf")), "data.frame")
+    expect_equal(ncol(get_TPM("../../inst/exdata/quant.sf")), 1)
+    expect_equal(class(get_TPM("../../inst/exdata/quant.sf")$TPM), "numeric")
 })
 
 test_that("output of get_TPM is data.frame", {
-    expect_equal(class(make_TPM_df("data")) , "data.frame")
+    expect_equal(class(make_TPM_df("../../inst/exdata")) , "data.frame")
 })
