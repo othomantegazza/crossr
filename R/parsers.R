@@ -1,14 +1,51 @@
-#' Extracts TPM for a Salmon Output File
+#' Extracts TPM from a Salmon Output File
 #'
 #' \code{get_TPM} is a wrapper for \code{\link{read.csv}} that loads and extracts
-#' TPM from a salmon output file provided in \code{path}
+#' TPM from a salmon output file (quant.sf) provided in \code{path}
 #'
-#' @param path a character string containing the path to the SALMON output file
+#' @param path a character string, the path to the (quant.sf) Salmon output
 
 get_TPM <- function(path) {
-    TPM <- read.csv(file = paste(path, "quant.sf", sep = "/"),
+    stopifnot(grepl("quant.sf$", path))
+    TPM <- read.csv(file = path,
                     sep = "\t", row.names = "Name")[, "TPM", drop = FALSE]
     return(TPM)
+}
+
+
+#' Make Expression Matrix from All Salmon Output Folders
+#'
+#' \code{Make_TPM_df} is a wrapper for \code{\link{get_TPM}}, it takes the path for
+#' the folder that contain the Salmon Output Folders for all your sample and returns
+#' the TPM expression matrix as a \code{data.frame} object
+#'
+#' @param path character string, the path for the folder that contains the Salmon results for all the samples
+
+make_TPM_df <- function(path) {
+    paths <- list.files(path = path,
+                        full.names = TRUE,
+                        recursive = TRUE)
+    paths <- grep("quant.sf$", paths, value = TRUE)
+    dat <- lapply(paths, get_TPM)
+
+    ## from here http://stackoverflow.com/questions/4752275/test-for-equality-among-all-elements-of-a-single-vector
+    zero_range <- function(x, tol = .Machine$double.eps ^ 0.5) {
+        if (length(x) == 1) return(TRUE)
+        x <- range(x) / mean(x)
+        isTRUE(all.equal(x[1], x[2], tolerance = tol))
+    }
+    stopifnot(zero_range(vapply(dat, nrow, numeric(1))))
+
+    names(dat) <- sub(paste0(normalizePath(path),"/"), "", paths)
+    names(dat) <- sub("/quant.sf", "", names(dat))
+
+    dat <- lapply(names(dat), function(i) {
+        colnames(dat[[i]]) <- i
+        return(dat[[i]])
+    })
+    dat <- data.frame(dat, check.rows = TRUE)
+
+    return(dat)
 }
 
 
