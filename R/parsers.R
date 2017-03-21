@@ -22,10 +22,12 @@ get_TPM <- function(path) {
 #' @param path character string, the path for the folder that contains the Salmon results for all the samples
 
 make_TPM_df <- function(path) {
+    stopifnot(is.character(path) & length(path) == 1)
     paths <- list.files(path = path,
                         full.names = TRUE,
                         recursive = TRUE)
     paths <- grep("quant.sf$", paths, value = TRUE)
+    if(length(paths) == 0) stop("No quant.sf file in the folder provided or in its subfolder")
     dat <- lapply(paths, get_TPM)
 
     ## from here http://stackoverflow.com/questions/4752275/test-for-equality-among-all-elements-of-a-single-vector
