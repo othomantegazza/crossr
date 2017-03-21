@@ -15,8 +15,8 @@ get_TPM <- function(path) {
 
 #' Make Expression Matrix from All Salmon Output Folders
 #'
-#' \code{Make_TPM_df} is a wrapper for \code{\link{get_TPM}}, it takes the path for
-#' the folder that contain the Salmon Output Folders for all your sample and returns
+#' \code{Make_TPM_df} is a wrapper for \code{\link{get_TPM}}, it takes as input the path
+#' for the folder that contain the Salmon output folders for all your sample and returns
 #' the TPM expression matrix as a \code{data.frame} object
 #'
 #' @param path character string, the path for the folder that contains the Salmon results for all the samples

@@ -2,14 +2,14 @@
 % Please edit documentation in R/parsers.R
 \name{get_TPM}
 \alias{get_TPM}
-\title{Extracts TPM for a Salmon Output File}
+\title{Extracts TPM from a Salmon Output File}
 \usage{
 get_TPM(path)
 }
 \arguments{
-\item{path}{a character string containing the path to the SALMON output file}
+\item{path}{a character string, the path to the (quant.sf) Salmon output}
 }
 \description{
 \code{get_TPM} is a wrapper for \code{\link{read.csv}} that loads and extracts
-TPM from a salmon output file provided in \code{path}
+TPM from a salmon output file (quant.sf) provided in \code{path}
 }
