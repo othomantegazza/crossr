@@ -52,28 +52,30 @@ make_TPM_df <- function(path) {
 
 
 
-#' Parse and Load an Orthogroup File Provided by Orthofinder
+#' Parse and Load an Orthogroup CSV File Provided by Orthofinder
 #'
-#' \code{parse_orthogroups} parses an orthogroup file provided by Orthofinder and
+#' \code{parse_orthogroups} parses an orthogroup \strong{CSV} file provided by Orthofinder and
 #' outputs the result as a list of orthogroups
 #'
 #' @param path_2_ogroups a character string that provides the path to the orthogroup
 #' file
+#'
+#' @section Warning: Orthofinder outputs both and OrthologousGroup.txt file and
+#' OrthologousGroup.csv file, this function is designed to parse the \strong{OrthologousGroup.csv} file
+#'
+#' @section Note: \url{https://github.com/davidemms/OrthoFinder}; Emms, D.M. and Kelly, S. (2015)
+#' OrthoFinder: solving fundamental biases in whole genome comparisons dramatically improves orthogroup
+#' inference accuracy, Genome Biology 16:157
 
 parse_orthogroups <- function(path_2_ogroups)
 {
     orthogroups <- scan(path_2_ogroups, what = "",
                         skip = 1, sep = "\n")
 
-    ### Don't know why some values are separated by tab in file
-    ### This fixes it
+    ### Not sure why some values are separated by tab in file
     orthogroups <- gsub("\t", ", ",
                         orthogroups)
 
-    ### why are GG identifiers different in mRNA and proteins
-    ### convert from CgyXXXXX to CgXXXXX  ##This might be prone
-    orthogroups <- gsub("y", "",
-                        orthogroups)
     orthogroups <- strsplit(orthogroups, ", ")
 
     ### names of orthogroup are read in first list element

@@ -2,7 +2,7 @@
 % Please edit documentation in R/parsers.R
 \name{parse_orthogroups}
 \alias{parse_orthogroups}
-\title{Parse and Load an Orthogroup File Provided by Orthofinder}
+\title{Parse and Load an Orthogroup CSV File Provided by Orthofinder}
 \usage{
 parse_orthogroups(path_2_ogroups)
 }
@@ -11,6 +11,17 @@ parse_orthogroups(path_2_ogroups)
 file}
 }
 \description{
-\code{parse_orthogroups} parses an orthogroup file provided by Orthofinder and
+\code{parse_orthogroups} parses an orthogroup \strong{CSV} file provided by Orthofinder and
 outputs the result as a list of orthogroups
 }
+\section{Warning}{
+ Orthofinder outputs both and OrthologousGroup.txt file and
+OrthologousGroup.csv file, this function is designed to parse the \strong{OrthologousGroup.csv} file
+}
+
+\section{Note}{
+ \url{https://github.com/davidemms/OrthoFinder}; Emms, D.M. and Kelly, S. (2015)
+OrthoFinder: solving fundamental biases in whole genome comparisons dramatically improves orthogroup
+inference accuracy, Genome Biology 16:157
+}
+

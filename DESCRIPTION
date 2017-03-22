@@ -17,4 +17,7 @@ RoxygenNote: 6.0.1
 Imports:
 	stringr (>= 1.2.0),
     parallel (>= 3.3.2)
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
