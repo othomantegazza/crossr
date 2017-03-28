@@ -2,10 +2,18 @@
 % Please edit documentation in R/linear_mod.R
 \name{add_fit}
 \alias{add_fit}
-\title{Add F-value from Linear Model to Orthologroup Expression Set}
+\title{Add F-values From Linear Model to Orthologroup Expression Set}
 \usage{
-add_fit(dat, coldata)
+add_fit(dat, coldata, design)
+}
+\arguments{
+\item{dat}{\code{data.frame} contains data for any gene}
+
+\item{coldata}{\code{data.frame} categorical variables with info for every samples}
+
+\item{design}{\code{formula}, encodes the assumption on how the variables in coldata
+explain the observed gene expression}
 }
 \description{
-Add F-value from Linear Model to Orthologroup Expression Set
+Add F-values From Linear Model to Orthologroup Expression Set
 }
