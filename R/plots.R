@@ -118,3 +118,19 @@ plot_keyword <- function(keyword, dset, clusters)
     to_plot <- rownames(dset[grep(keyword, dat_fit_log$annos_th), ])
     sapply(to_plot, plot_all_stages, dset = dset, clusters = clusters)
 }
+
+#' Plot an Histogram og Orthogroup Dimension
+#'
+#' \code{explore_ogroups} is a wrapper for the \code{plot} method for \code{table}
+#'
+#' @param groups a \code{list} of orthogroups
+#' @param main an overall title for the plot
+
+explore_ogroups <- function(groups, main = "dimension of orthogroups")
+{
+    stopifnot(is.list(groups))
+    plot(table(sapply(groups, length)),
+         frame = F, ylab = "number of groups",
+         xlab = "genes per group", main = main)
+    grid()
+}
