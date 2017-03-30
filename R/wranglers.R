@@ -18,6 +18,9 @@ collapse_orthologs <- function(eset, ogroups, mc.cores = 1)
 
     ogroups_es <- parallel::mclapply(ogroups, function(i) eset[ grep( paste( i, collapse = "|" ), rownames(eset)), ] ,
                                      mc.cores = mc.cores)
+    ### This fills with NA the expression of the orthogroups with no genes for this species
+    ogroups_es <- parallel::mclapply(ogroups_es, function(i) if(nrow(i) == 0) i[1, ] else i,
+                                     mc.cores = mc.cores)
     ogroups_es <- parallel::mclapply(ogroups_es, function(i) apply(i, 2, sum),
                                      mc.cores = mc.cores)
     ogroups_es <- do.call(rbind, ogroups_es)
