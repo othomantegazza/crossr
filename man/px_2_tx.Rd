@@ -7,6 +7,8 @@
 px_2_tx(ogroups, anno_file, tx_id, px_id, mc.cores = 1)
 }
 \arguments{
+\item{ogroups}{a \code{list} of orthogroups}
+
 \item{anno_file}{a character string containing the path to the annotation file in tabulated format}
 
 \item{tx_id}{a \code{character} string indicating the name of the column of transcript ids in the annotation file}
@@ -14,8 +16,6 @@ px_2_tx(ogroups, anno_file, tx_id, px_id, mc.cores = 1)
 \item{px_id}{a \code{character} string indicating the name of the column of protein ids in the annotation file}
 
 \item{mc.cores}{\code{numeric}, the number of threads used for \code{mclapply}}
-
-\item{groups}{a \code{list} of orthogroups}
 }
 \description{
 Orthogroups are generated on protein sequence, \code{px_2_tx} converts protein ID to transcript ID in an orthogroup list
