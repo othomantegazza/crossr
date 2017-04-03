@@ -29,7 +29,6 @@ add_fit <- function(dat, coldata, design)
     fits <- as.data.frame(do.call(rbind, fits))
 
     dat_fit <- merge(dat, fits, by = "row.names"); rownames(dat_fit) <- dat_fit$Row.names; dat_fit$Row.names <- NULL
-    dat_fit <- dat_fit[order(dat_fit$`spc:stg`, decreasing = T), ]
     return(dat_fit)
 }
 
