@@ -48,7 +48,7 @@ devtools::load_all()
 list.files("../genomes/thaliana")
 ```
 
-and every subfolder contain a typical Salmin output
+and every subfolder contain a typical Salmon output
 
 ```{r}
 list.files("../genomes/thaliana/SRR2033948")

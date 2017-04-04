@@ -1,0 +1,66 @@
+---
+title: "A quick introduction to crossr"
+author: "Otho Mantegazza"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{overview of crossr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo=FALSE, message=FALSE}
+devtools::load_all()
+```
+
+Crossr is a set of function and a workflow that I use for quantitative comparison of gene expression in different species.
+
+The package builds up on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
+
+The data in the examples come from here: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077)
+
+### Load Data
+ 
+The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the path to the folder that contains all the Salmon output subfolders for a species
+
+```{r}
+list.files("../genomes/thaliana")
+```
+
+```{r}
+list.files("../genomes/thaliana/SRR2033948")
+```
+
+The function `make_TPM_df` extracts the TPM from all the `.sf` files in every subfolder and organizes them in a `data.frame`.
+
+Here I use it to produce an expression matrix for the two species `thaliana` and `lyrata`.
+
+```{r}
+thaliana <- make_TPM_df("../genomes/thaliana")
+str(thaliana)
+dim(thaliana)
+```
+
+```{r}
+lyrata <- make_TPM_df("../genomes/lyrata")
+str(lyrata)
+dim(lyrata)
+```
+
+### Load orthogroups
+
+The homology groups are called orthogroups and in orthofinder are defined as:
+
+> the set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
+
+The orthogroups are provided in the `OrthologousGroups.csv` file in the orthofinder output.
+Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. The function `parse_orthogroups()` takes as input **exclusively the csv file** provided as a path.
+
+```{r}
+ogroups <- parse_orthogroups("../genomes/orthogroups/OrthologousGroups.csv")
+```
+
+### Convert protein ID to transcript ID
+
+Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the protein ID in the orthogroups in transcript ID. The function `px_2_tx()` performs this task. It requires an external file that maps the protein ID to transcript ID.
+
