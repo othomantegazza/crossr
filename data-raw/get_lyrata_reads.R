@@ -104,4 +104,4 @@ sapply(sra_paths, dump_fastq)
 #
 # python OrthoFinder-master/orthofinder.py -f lyrata/orthogroups -t 3
 #
-# python OrthoFinder-master/orthofinder.py -b ~/lyrata/orthogroups/Results_Apr3/WorkingDirectory
+# python OrthoFinder-master/orthofinder.py -b ~/lyrata/orthogroups/Results_Apr03/WorkingDirectory
