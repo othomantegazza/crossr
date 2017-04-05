@@ -19,7 +19,7 @@ The package builds up on the output of [Salmon](https://combine-lab.github.io/sa
 
 The data in the examples come from here: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077)
 
-### Load Data
+## Load Data
  
 The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the path to the folder that contains all the Salmon output subfolders for a species
 
@@ -47,7 +47,7 @@ str(lyrata)
 dim(lyrata)
 ```
 
-### Load orthogroups
+## Load orthogroups
 
 The homology groups are called orthogroups and in orthofinder are defined as:
 
@@ -60,7 +60,95 @@ Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups
 ogroups <- parse_orthogroups("../genomes/orthogroups/OrthologousGroups.csv")
 ```
 
-### Convert protein ID to transcript ID
+The dimension of the orthogroups can be explored with the function `explore_ogroups()`
 
-Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the protein ID in the orthogroups in transcript ID. The function `px_2_tx()` performs this task. It requires an external file that maps the protein ID to transcript ID.
+```{r, fig.width= 7, fig.height=4, fig.cap="Figure 1"}
+explore_ogroups(ogroups)
+```
 
+
+## Convert protein ID to transcript ID
+
+Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the protein ID in the orthogroups in transcript ID. The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
+
+Loading the feature table from refseq can be challenging, this loads the *A. thaliana* one
+```{r}
+thaliana_id_path <- "../genomes/GCF_000001735.3_TAIR10_feature_table.txt"
+thaliana_ids <- read.table(file = thaliana_id_path,
+                           sep = "\t", header = FALSE,
+                           stringsAsFactors = FALSE,
+                           quote = "")
+
+## Not sure why the header is commented with "#"
+colnames(thaliana_ids) <-  scan(file = thaliana_id_path,
+                                what = "",
+                                nlines = 1)[-1]  
+```
+
+And this loads the *A. lyrata* one.
+```{r}
+lyrata_id_path <- "../genomes/GCF_000004255.1_v.1.0_feature_table.txt"
+lyrata_ids <- read.table(file = lyrata_id_path,
+                         sep = "\t", header = FALSE,
+                         stringsAsFactors = FALSE,
+                         quote = "",
+                         skip = 1,
+                         comment.char = "") # One gene name contains "#"
+
+## Not sure why the header is commented with "#"
+colnames(lyrata_ids) <-  scan(file = lyrata_id_path,
+                                what = "",
+                                nlines = 1)[-1]  
+```
+
+
+Then we can use `switch_ids()` to convert the IDS from *A. thaliana* first, 
+
+```{r}
+ogroups <- switch_ids(ogroups = ogroups,
+                      ids_table = thaliana_ids,
+                      px_id = "product_accession",
+                      tx_id = "related_accession",
+                      mc.cores = 4)
+```
+
+and then the ones from *A. lyrata*.
+
+```{r}
+ogroups <- switch_ids(ogroups = ogroups,
+                      ids_table = lyrata_ids,
+                      px_id = "product_accession",
+                      tx_id = "related_accession",
+                      mc.cores = 4)
+```
+
+## Collapse orthologues
+
+As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A *quick and dirty* solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
+
+The basic **assumption** of this method is that genes in the sam e orthogroup have the same function
+
+The function `collapse_orthogroups()`performs this task.
+
+again, first for *A. thaliana*
+```{r}
+thaliana_og <- collapse_orthologs(eset = thaliana,
+                                  ogroups = ogroups,
+                                  mc.cores = 4)
+```
+
+and then for *A.lyrata*
+
+```{r}
+lyrata_og <- collapse_orthologs(eset = lyrata,
+                                  ogroups = ogroups,
+                                  mc.cores = 4)
+```
+                   
+Not all orthog
+
+## Select genes that behave differently between species
+
+Now that we moved to ortholog-wise expression, we are dealing with a one to one relationship among species.
+
+In order to stay on the safe side I do not perform direct comparison of expression level between the two species, but use the F-value on the interaction term to screen for orthogroups that display a relative different expression pattern between the two species

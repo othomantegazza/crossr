@@ -37,10 +37,12 @@ sapply(sra_paths, dump_fastq)
 ### Lyrata transcriptome and proteome downloaded from
 ### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_lyrata/all_assembly_versions/GCF_000004255.1_v.1.0/GCF_000004255.1_v.1.0_rna.fna.gz
 ### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_lyrata/all_assembly_versions/GCF_000004255.1_v.1.0/GCF_000004255.1_v.1.0_protein.faa.gz
+### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_lyrata/all_assembly_versions/GCF_000004255.1_v.1.0/GCF_000004255.1_v.1.0_feature_table.txt.gz
 
 ### Arabidopsis transcriptome downloaded from
 ### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_thaliana/latest_assembly_versions/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_protein.faa.gz
 ### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_thaliana/latest_assembly_versions/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_rna.fna.gz
+### ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_thaliana/latest_assembly_versions/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_feature_table.txt.gz
 
 ### index generation for lyrata -----------------------------------------------------------------
 

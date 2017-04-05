@@ -43,7 +43,6 @@ px_2_tx <- function(ogroups,
                     px_id,
                     mc.cores = 1)
 {
-    # th_id_file <- "~/Google Drive/Cross_species_comparison/genomes/t_hassleriana_from_ncbi/GCF_000463585.1_ASM46358v1_feature_table.txt"
     ids <- read.table(anno_file,
                       sep = "\t", header = TRUE,
                       stringsAsFactors = FALSE,
@@ -58,6 +57,33 @@ px_2_tx <- function(ogroups,
     }
     ogroups <- parallel::mclapply(ogroups, function(i) {
         unname(sapply(i, switch_ids))},
+        mc.cores = mc.cores)
+    return(ogroups)
+}
+
+#' Utility for Converting Ids
+#'
+#' \code{switch_ids} is a small utility function that can be used to convert protein ID to transcript ID in an orthogroups
+#'
+#' @param ogroups a \code{list} of orthogroups
+#' @param ids_table a \code{data.frame} that matches the protein ID to transcript ID
+#' @param tx_id a \code{character} string indicating the name of the column of transcript ids in the annotation file
+#' @param px_id a \code{character} string indicating the name of the column of protein ids in the annotation file
+#' @param mc.cores \code{numeric}, the number of threads used for \code{mclapply}
+
+switch_ids <- function(ogroups, ids_table, px_id, tx_id, mc.cores = 1)
+{
+    switcher <- function(id)
+    {
+        if(id %in% as.character(ids_table[, px_id])) {
+            return(ids_table[which(as.character(ids_table[, px_id]) == id), tx_id])
+        } else return(id)
+    }
+    ogroups <- parallel::mclapply(ogroups, function(i) {
+        og <- unname(sapply(i, switcher))
+        og[og == ""] <- "NO_MATCH"
+        return(og)
+        },
         mc.cores = mc.cores)
     return(ogroups)
 }
