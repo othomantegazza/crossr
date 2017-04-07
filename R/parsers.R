@@ -46,6 +46,11 @@ make_TPM_df <- function(path) {
         return(dat[[i]])
     })
     dat <- data.frame(dat, check.rows = TRUE)
+    colnames(dat) <- vapply(colnames(dat), function(i){
+        i <- strsplit(i, "\\.")[[1]]
+        i <- i[length(i)]
+        return(i)}, character(1))
+    return(dat)
 
     return(dat)
 }

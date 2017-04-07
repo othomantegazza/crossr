@@ -47,6 +47,31 @@ str(lyrata)
 dim(lyrata)
 ```
 
+if more info on the samples are available, it might be useful to change the `colnames` of the expression sets to a more informative version. In this case the feature table is also provided 
+
+```{r}
+sample_info <-  read.table("../genomes/SRP058527_metadata.txt",
+                           header = TRUE,
+                           sep = "\t")  
+reduce_info <- function(info) {
+    if(info == "heat stress 0 h") "0h"
+    else if(info == "heat stress 6 h 37\302\260C") "heat_6h"
+    else "recovery"
+}
+sample_info$etime <- vapply(sample_info$exposure_time_s,
+                            reduce_info,
+                            character(1))
+
+switch_name <- function(name) {
+    if(name %in% sample_info$Run_s) {
+    sample_info[sample_info$Run_s == name, "etime", drop = TRUE]
+    } else name
+    }
+colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
+colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
+```
+
+
 ## Load orthogroups
 
 The homology groups are called orthogroups and in orthofinder are defined as:
@@ -135,6 +160,9 @@ again, first for *A. thaliana*
 thaliana_og <- collapse_orthologs(eset = thaliana,
                                   ogroups = ogroups,
                                   mc.cores = 4)
+head(thaliana_og)
+tail(thaliana_og)
+summary(thaliana_og)
 ```
 
 and then for *A.lyrata*
@@ -143,6 +171,9 @@ and then for *A.lyrata*
 lyrata_og <- collapse_orthologs(eset = lyrata,
                                   ogroups = ogroups,
                                   mc.cores = 4)
+head(lyrata_og)
+tail(lyrata_og)
+summary(lyrata_og)
 ```
                    
 Not all orthog
