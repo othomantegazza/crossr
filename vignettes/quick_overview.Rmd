@@ -61,6 +61,9 @@ reduce_info <- function(info) {
 sample_info$etime <- vapply(sample_info$exposure_time_s,
                             reduce_info,
                             character(1))
+sample_info$etime <- paste(sample_info$etime,
+                           c(1, 2),
+                           sep = "_")
 
 switch_name <- function(name) {
     if(name %in% sample_info$Run_s) {
@@ -68,7 +71,14 @@ switch_name <- function(name) {
     } else name
     }
 colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
-colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
+colnames(thaliana) <- paste("thal",
+                            colnames(thaliana),
+                            sep = "_")
+
+colnames(lyrata) <- vapply(colnames(lyrata), switch_name, character(1))
+colnames(lyrata) <- paste("lyr",
+                          colnames(lyrata),
+                          sep = "_")
 ```
 
 
@@ -175,11 +185,64 @@ head(lyrata_og)
 tail(lyrata_og)
 summary(lyrata_og)
 ```
-                   
-Not all genes fall orthogroups, and not all orthogroups are represented in both species
+
+Not all orthogroups contain genes from both species, indeed both orthogroup expression datasets contain `NA` values. We can `merge` the datasets and remove the lines that contain `NA`
+
+```{r}
+og_eset <- merge(thaliana_og, lyrata_og,
+                 by = "row.names", all = TRUE)
+rownames(og_eset) <- og_eset$Row.names; og_eset$Row.names <- NULL
+```
+
+While removing `NA`, the orthogroups that are not represented in both species can be saved for later analyses
+
+```{r}
+og_NOMATCH <- og_eset[!complete.cases(og_eset), ]
+og_eset <- og_eset[complete.cases(og_eset), ]
+```
+
 
 ## Select genes that behave differently between species
 
 Now that we moved to ortholog-wise expression, we are dealing with a one to one relationship among species.
 
-In order to stay on the safe side I do not perform direct comparison of expression level between the two species, but use the F-value on the interaction term to screen for orthogroups that display a relative different expression pattern between the two species
+In order to stay on the safe side I do not perform direct comparison of expression level between the two species, but use the F-value on the interaction term to screen for orthogroups that display a relative different expression pattern between the two species.
+
+Also, since the data have gone through many transformation it is hard to make assumption on their distribution, therefore I do not extract a p-value, rather I use the F-value on the interaction term as a ranking feature, in order to select the genes that seem to behave differently among the species.
+
+The function that fits the linear model and performs ANOVA is called `add_fit()`
+
+I suggest to run `add_fit()` on log scaled TPMs.
+
+```{r}
+og_eset_log <- log(og_eset + 1)
+# colnames(og_eset_log)
+# 
+# colnames(og_eset_log)[1:6] <- paste("thal",
+#                                     colnames(og_eset_log)[1:6],
+#                                     sep = "_")
+# colnames(og_eset_log)[7:12] <- paste("lyr",
+#                                     colnames(og_eset_log)[7:12],
+#                                     sep = "_")
+# colnames(og_eset_log) <- sapply(colnames(og_eset_log), function(i) strsplit(i, split = "\\.")[[1]][1]) 
+```
+
+Moreover, the function `add_fit()` requires data on how the columns are grouped together.
+
+```{r}
+coldata <- data.frame(spc = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][1]),
+                      treat = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][2]))
+
+coldata
+```
+
+Now we can add the fit
+
+```{r}
+og_fit <- add_fit(dat = og_eset_log,
+                  coldata = coldata,
+                  ogdesign = ~ spc + treat + spc:treat) 
+```
+
+
+
