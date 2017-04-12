@@ -4,18 +4,18 @@
 \alias{switch_ids}
 \title{Utility for Converting Ids}
 \usage{
-switch_ids(ogroups, ids_table, px_ids, tx_ids, mc.cores = 1)
+switch_ids(ogroups, ids_table, px_id, tx_id, mc.cores = 1)
 }
 \arguments{
 \item{ogroups}{a \code{list} of orthogroups}
 
 \item{ids_table}{a \code{data.frame} that matches the protein ID to transcript ID}
 
-\item{mc.cores}{\code{numeric}, the number of threads used for \code{mclapply}}
+\item{px_id}{a \code{character} string indicating the name of the column of protein ids in the annotation file}
 
 \item{tx_id}{a \code{character} string indicating the name of the column of transcript ids in the annotation file}
 
-\item{px_id}{a \code{character} string indicating the name of the column of protein ids in the annotation file}
+\item{mc.cores}{\code{numeric}, the number of threads used for \code{mclapply}}
 }
 \description{
 \code{switch_ids} is a small utility function that can be used to convert protein ID to transcript ID in an orthogroups

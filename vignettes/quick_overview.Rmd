@@ -176,7 +176,7 @@ tail(lyrata_og)
 summary(lyrata_og)
 ```
                    
-Not all orthog
+Not all genes fall orthogroups, and not all orthogroups are represented in both species
 
 ## Select genes that behave differently between species
 

@@ -1,0 +1,175 @@
+---
+title: "Untitled"
+author: "Otho Mantegazza"
+date: "April 11, 2017"
+output: html_document
+---
+
+In to make the vignette slimmer, I will apply the crossr workflow only to a subset of orthogroups will 500 be enough?
+
+The script is in Markdown only because I find it easier to invoke bash commands here then in simple R scripts 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**NOTE: ON LINUX --> SHUF; ON MACOS --> GSHUF**
+
+
+```{bash}
+head -n 1 ../genomes/orthogroups/OrthologousGroups.csv > ../inst/exdata/ogroups_sample.csv
+
+gshuf --random-source=../genomes/GCF_000001735.3_TAIR10_feature_table.txt ../genomes/orthogroups/OrthologousGroups.csv | head -n 500 >> ../inst/exdata/ogroups_sample.csv
+```
+
+```{r}
+devtools::load_all("..")
+ogroups <- parse_orthogroups("../inst/exdata/ogroups_sample.csv")
+length(ogroups)
+head(ogroups)
+explore_ogroups(ogroups)
+```
+
+Do all genes start with NP or XP
+
+```{r}
+starts <- unlist(lapply(ogroups, function(i) substr(i, 1, 2)))
+table(starts)
+```
+
+Yes, sort genes from *thaliana* (NP) and *lyrata* (XP).
+
+```{r}
+ids <- list(thaliana = "^NP", lyrata = "^XP")
+ids <- lapply(ids, function(i) grep(i, unlist(ogroups), value = TRUE))
+write(paste(ids$thaliana, collapse = "|"), file = "p_thaliana.txt")
+write(paste(ids$lyrata, collapse = "|"), file = "p_lyrata.txt")
+```
+
+<http://unix.stackexchange.com/questions/37313/how-do-i-grep-for-multiple-patterns>
+
+<http://unix.stackexchange.com/questions/83260/reading-grep-patterns-from-a-file> 
+
+And get the protein ids from the feature tables of thaliana and lyrata. You need this to convert the ids in the orthogroups
+
+```{bash}
+head -n 1 ../genomes/GCF_000001735.3_TAIR10_feature_table.txt > ../inst/exdata/thaliana_features_sample.txt
+egrep -f p_thaliana.txt ../genomes/GCF_000001735.3_TAIR10_feature_table.txt >> ../inst/exdata/thaliana_features_sample.txt
+rm p_thaliana.txt
+```
+
+```{bash}
+head -n 1 ../genomes/GCF_000004255.1_v.1.0_feature_table.txt > ../inst/exdata/lyrata_features_sample.txt
+egrep -f p_lyrata.txt ../genomes/GCF_000004255.1_v.1.0_feature_table.txt >> ../inst/exdata/lyrata_features_sample.txt
+rm p_lyrata.txt
+```
+
+Now use those files to change the ids in the orthogroups, in order to do so 
+
+First: load the thaliana feature table
+
+```{r}
+
+thaliana_id_path <- "../inst/exdata/thaliana_features_sample.txt"
+thaliana_ids <- read.table(file = thaliana_id_path,
+                           sep = "\t", header = FALSE,
+                           stringsAsFactors = FALSE,
+                           quote = "")
+
+## Not sure why the header is commented with "#"
+colnames(thaliana_ids) <-  scan(file = thaliana_id_path,
+                                what = "",
+                                nlines = 1)[-1]  
+
+```
+
+Then the lyrata one
+
+```{r}
+lyrata_id_path <- "../inst/exdata/lyrata_features_sample.txt"
+lyrata_ids <- read.table(file = lyrata_id_path,
+                         sep = "\t", header = FALSE,
+                         stringsAsFactors = FALSE,
+                         quote = "",
+                         skip = 1,
+                         comment.char = "") # One gene name contains "#"
+
+## Not sure why the header is commented with "#"
+colnames(lyrata_ids) <-  scan(file = lyrata_id_path,
+                                what = "",
+                                nlines = 1)[-1]  
+
+```
+
+and then get switch the ids
+
+```{r}
+ogroups <- switch_ids(ogroups = ogroups,
+                      ids_table = thaliana_ids,
+                      px_id = "product_accession",
+                      tx_id = "related_accession",
+                      mc.cores = 4)
+
+ogroups <- switch_ids(ogroups = ogroups,
+                      ids_table = lyrata_ids,
+                      px_id = "product_accession",
+                      tx_id = "related_accession",
+                      mc.cores = 4)
+```
+
+And now use the transcript orthogroups in order to select the groups from the quantification files
+
+Do all genes start with NM or XM now?
+
+```{r}
+starts <- unlist(lapply(ogroups, function(i) substr(i, 1, 2)))
+table(starts)
+
+ids <- list(thaliana = "^NM", lyrata = "^XM")
+ids <- lapply(ids, function(i) grep(i, unlist(ogroups), value = TRUE))
+write(paste(ids$thaliana, collapse = "|"), file = "tx_thaliana.txt")
+write(paste(ids$lyrata, collapse = "|"), file = "tx_lyrata.txt")
+```
+
+
+Yes, therefore, let's select the thaliana transcripts
+
+```{bash}
+mkdir ../inst/exdata/thaliana
+
+for i in ../genomes/thaliana/*/quant.sf; do
+
+base=${i#../genomes/}
+# echo $base
+f=${base%/quant.sf}
+# echo $f
+
+mkdir ../inst/exdata/$f
+head -n 1 $i > ../inst/exdata/$base
+
+egrep -f tx_thaliana.txt $i >> ../inst/exdata/$base
+done
+
+
+rm tx_thaliana.txt
+```
+
+```{bash}
+mkdir ../inst/exdata/lyrata
+
+for i in ../genomes/lyrata/*/quant.sf; do
+
+base=${i#../genomes/}
+# echo $base
+f=${base%/quant.sf}
+# echo $f
+
+mkdir ../inst/exdata/$f
+head -n 1 $i > ../inst/exdata/$base
+
+egrep -f tx_lyrata.txt $i >> ../inst/exdata/$base
+done
+
+
+rm tx_lyrata.txt
+```
