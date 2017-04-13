@@ -61,8 +61,13 @@ thaliana <- make_TPM_df("../genomes/thaliana")
 str(thaliana)
 ```
 
+## Session info
 
+Here is the output of `devtools::session_info()` on the system on which this document was compiled:
 
+```{r, echo=FALSE}
+devtools::session_info()
+```
 
 
 

@@ -244,5 +244,11 @@ og_fit <- add_fit(dat = og_eset_log,
                   ogdesign = ~ spc + treat + spc:treat) 
 ```
 
+## Session info
 
+Here is the output of `devtools::session_info()` on the system on which this document was compiled:
+
+```{r, echo=FALSE}
+devtools::session_info()
+```
 
