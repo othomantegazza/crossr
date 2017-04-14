@@ -29,6 +29,7 @@ add_fit <- function(dat, coldata, design)
     fits <- as.data.frame(do.call(rbind, fits))
 
     dat_fit <- merge(dat, fits, by = "row.names"); rownames(dat_fit) <- dat_fit$Row.names; dat_fit$Row.names <- NULL
+    dat_fit$Residuals <- NULL
     return(dat_fit)
 }
 
