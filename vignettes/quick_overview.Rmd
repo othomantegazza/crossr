@@ -17,18 +17,20 @@ Crossr is a set of function and a workflow that I use for quantitative compariso
 
 The package builds up on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
 
-The data in the examples come from here: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077)
+In this vignette I replicate the crossr workflow on this dataset: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077), which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944)
+
+In order to make this Vignette lighter, the workflow is run here on a random subset of 500 orthogroups.
 
 ## Load Data
  
 The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the path to the folder that contains all the Salmon output subfolders for a species
 
 ```{r}
-list.files("../genomes/thaliana")
+list.files("../inst/exdata/thaliana")
 ```
 
 ```{r}
-list.files("../genomes/thaliana/SRR2033948")
+list.files("../inst/exdata/thaliana/SRR2033948")
 ```
 
 The function `make_TPM_df` extracts the TPM from all the `.sf` files in every subfolder and organizes them in a `data.frame`.
@@ -36,21 +38,21 @@ The function `make_TPM_df` extracts the TPM from all the `.sf` files in every su
 Here I use it to produce an expression matrix for the two species `thaliana` and `lyrata`.
 
 ```{r}
-thaliana <- make_TPM_df("../genomes/thaliana")
+thaliana <- make_TPM_df("../inst/exdata/thaliana")
 str(thaliana)
 dim(thaliana)
 ```
 
 ```{r}
-lyrata <- make_TPM_df("../genomes/lyrata")
+lyrata <- make_TPM_df("../inst/exdata/lyrata")
 str(lyrata)
 dim(lyrata)
 ```
 
-if more info on the samples are available, it might be useful to change the `colnames` of the expression sets to a more informative version. In this case the feature table is also provided 
+if more info on the samples are available, it might be useful to change the `colnames` of the expression sets to a more informative version. In this case we can use the feature table to do so.
 
 ```{r}
-sample_info <-  read.table("../genomes/SRP058527_metadata.txt",
+sample_info <-  read.table("../inst/exdata/SRP058527_metadata.txt",
                            header = TRUE,
                            sep = "\t")  
 reduce_info <- function(info) {
@@ -74,17 +76,19 @@ colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
 colnames(thaliana) <- paste("thal",
                             colnames(thaliana),
                             sep = "_")
+str(thaliana)
 
 colnames(lyrata) <- vapply(colnames(lyrata), switch_name, character(1))
 colnames(lyrata) <- paste("lyr",
                           colnames(lyrata),
                           sep = "_")
+str(lyrata)
 ```
 
 
 ## Load orthogroups
 
-The homology groups are called orthogroups and in orthofinder are defined as:
+The homology groups are called orthogroups and in [orthofinder](https://github.com/davidemms/OrthoFinder) are defined as:
 
 > the set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
 
@@ -92,7 +96,7 @@ The orthogroups are provided in the `OrthologousGroups.csv` file in the orthofin
 Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. The function `parse_orthogroups()` takes as input **exclusively the csv file** provided as a path.
 
 ```{r}
-ogroups <- parse_orthogroups("../genomes/orthogroups/OrthologousGroups.csv")
+ogroups <- parse_orthogroups("../inst/exdata/ogroups_sample.csv")
 ```
 
 The dimension of the orthogroups can be explored with the function `explore_ogroups()`
@@ -108,7 +112,7 @@ Since orthogroups are inferred on protein sequences but short reads are mapped o
 
 Loading the feature table from refseq can be challenging, this loads the *A. thaliana* one
 ```{r}
-thaliana_id_path <- "../genomes/GCF_000001735.3_TAIR10_feature_table.txt"
+thaliana_id_path <- "../inst/exdata/thaliana_features_sample.txt"
 thaliana_ids <- read.table(file = thaliana_id_path,
                            sep = "\t", header = FALSE,
                            stringsAsFactors = FALSE,
@@ -122,7 +126,7 @@ colnames(thaliana_ids) <-  scan(file = thaliana_id_path,
 
 And this loads the *A. lyrata* one.
 ```{r}
-lyrata_id_path <- "../genomes/GCF_000004255.1_v.1.0_feature_table.txt"
+lyrata_id_path <- "../inst/exdata/lyrata_features_sample.txt"
 lyrata_ids <- read.table(file = lyrata_id_path,
                          sep = "\t", header = FALSE,
                          stringsAsFactors = FALSE,
@@ -161,7 +165,7 @@ ogroups <- switch_ids(ogroups = ogroups,
 
 As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A *quick and dirty* solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
 
-The basic **assumption** of this method is that genes in the sam e orthogroup have the same function
+The basic **assumption** of this method is that genes in the same orthogroup have the same function
 
 The function `collapse_orthogroups()`performs this task.
 
@@ -198,7 +202,10 @@ While removing `NA`, the orthogroups that are not represented in both species ca
 
 ```{r}
 og_NOMATCH <- og_eset[!complete.cases(og_eset), ]
+dim(og_NOMATCH)
+
 og_eset <- og_eset[complete.cases(og_eset), ]
+dim(og_eset)
 ```
 
 
@@ -241,7 +248,7 @@ Now we can add the fit
 ```{r}
 og_fit <- add_fit(dat = og_eset_log,
                   coldata = coldata,
-                  ogdesign = ~ spc + treat + spc:treat) 
+                  design = ~ spc + treat + spc:treat) 
 ```
 
 ## Session info
