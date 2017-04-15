@@ -4,17 +4,20 @@
 \alias{plot_all_stages}
 \title{Plot the Expression of One Orthogroup in Both Species}
 \usage{
-plot_all_stages(ogroup, dset, ylab = "normalized expression",
-  clusters = "cls_here")
+plot_all_stages(orthogroup, dset, species, condition, main = "", ...)
 }
 \arguments{
-\item{ogroup}{a character string}
+\item{orthogroup}{a \code{character} string}
 
-\item{dset}{a numeric data.frame with ogroups as rownames}
+\item{dset}{a numeric \code{data.frame} with orthogroups id as row names}
 
-\item{ylab}{a character string}
+\item{species}{a \code{character} vector containing the species of the
+samples in the columns of the dset}
 
-\item{clusters}{a named numeric vector}
+\item{condition}{a \code{character} vector containing the experimental
+conditions of the samples in the columns of the dset}
+
+\item{main}{the title of the plot}
 }
 \description{
 \code{plot_all_stages} is a wrapper for \code{stripchart} and plots a stripchart

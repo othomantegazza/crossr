@@ -8,58 +8,51 @@
 #' stripchart contains details on: how many genes are in the orthogroup, the cluster
 #' that contain the ogroup (if any), the F-value for the interaction term.
 #'
-#' @param ogroup a character string
-#' @param dset a numeric data.frame with ogroups as rownames
-#' @param ylab a character string
-#' @param clusters a named numeric vector
+#' @param orthogroup a \code{character} string
+#' @param dset a numeric \code{data.frame} with orthogroups id as row names
+#' @param species a \code{character} vector containing the species of the
+#'  samples in the columns of the dset
+#' @param condition a \code{character} vector containing the experimental
+#' conditions of the samples in the columns of the dset
+#' @param main the title of the plot
 
 
-plot_all_stages <- function(ogroup,
+plot_all_stages <- function(orthogroup,
                             dset,
-                            ylab = "normalized expression",
-                            clusters = "cls_here")
+                            species,
+                            condition,
+                            main = "",
+                            ...)
 {
-    # old <- par()
-    # on.exit(par(old), add = TRUE)
-    par(mar = c(5, 4, 8, 2))
+    old_mar <- par()$mar
+    on.exit(par(mar = old_mar))
+    stopifnot(ncol(dset) == length(species) && ncol(dset) == length(condition))
 
-    coldata <- substr(colnames(dset[, 1:36]), 1, 4)
-    th_points <- split(dset[ogroup, grep("^th", colnames(dset)), drop = TRUE],
-                       as.factor(grep("^th", coldata, value = TRUE)))
-    gg_points <- split(dset[ogroup, grep("^gg", colnames(dset)), drop = TRUE],
-                       as.factor(grep("^gg", coldata, value = TRUE)))
-    stripchart(th_points,
+    # par(mar = c(5, 4, 8, 2))
+
+    spc_levels <- unique(species)
+    a_points <- split(dset[orthogroup, species == spc_levels[1], drop = TRUE],
+                       as.factor(condition[species == spc_levels[1]]))
+    a_points <- lapply(a_points, unlist)
+
+    b_points <- split(dset[orthogroup, species == spc_levels[2], drop = TRUE],
+                      as.factor(condition[species == spc_levels[2]]))
+    b_points <- lapply(b_points, unlist)
+
+    stripchart(a_points,
                frame = FALSE, vertical = TRUE,
-               ylim = range(unlist(c(th_points, gg_points))),
+               ylim = range(unlist(c(a_points, b_points))),
                pch = 16, method = "jitter",
-               ylab = ylab,
-               xlab = "Stage",
-               xaxt = "n",
-               main = paste(ogroup, #"\n",
-                            # paste(ogroup_es_both_annos[[ogroup]]$annos, collapse = "\n"), "\n",
-                            # paste(og[[ogroup]], collapse = " "),
-                            # gsub(" - ", "\n", dset[ogroup, "annos_th"]),
-                            dset[ogroup, "annos_th"],
-                            paste0("F-value = ", round( dset[ogroup, "spc:stg"], 2 )  ),
-                            paste0("genes in ogroup: ", length(og[[ogroup]]),
-                                   "; of which ", length( grep("Cg", og[[ogroup]]) ), " from Gg, ",
-                                   "and ", length( grep("XM", og[[ogroup]]) ), " from Th"),
-                            cls <- ifelse( any(clusters == "cls_here"),
-                                           "",
-                                           ifelse(ogroup %in% names( clusters ),
-                                                  paste0("in cluster ", unname(clusters[ogroup]) ),
-                                                  "not in clusters") ),
-                            sep = " \n "))
-    stages <- length(unique(coldata))/2
-    axis(side = 1, at = 1:stages, labels = paste("Stage", 0:(stages - 1), sep = ""))
-    stripchart(gg_points,
+               main = ifelse(main == "", orthogroup, main),
+               ...)
+    stripchart(b_points,
                frame = FALSE, vertical = TRUE, add = TRUE,
-               pch = 17, method = "jitter",
-               ylab = "size adjusted CPM",
-               xlab = "species - stage")
-    lines(1:stages, sapply(th_points, function(i) median(unlist(i))), lty = 2)
-    lines(1:stages, sapply(gg_points, function(i) median(unlist(i))), lty = 3)
-    legend("topright", legend = c("C3", "C4"), lty = c(2, 3), bty = "n")
+               pch = 17, method = "jitter")
+    lines(1:length(a_points), vapply(a_points, median, numeric(1)), lty = 2)
+    lines(1:length(b_points), vapply(b_points, median, numeric(1)), lty = 3)
+    legend("topright",
+           legend = c(spc_levels[1], spc_levels[2]),
+           lty = c(2, 3), bty = "n")
 }
 
 #' plot the expression of all genes within one orthogroup

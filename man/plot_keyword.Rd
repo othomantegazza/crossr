@@ -9,9 +9,7 @@ plot_keyword(keyword, dset, clusters)
 \arguments{
 \item{keyword}{a character string}
 
-\item{dset}{a numeric data.frame with ogroups as rownames}
-
-\item{clusters}{a named numeric vector}
+\item{dset}{a numeric \code{data.frame} with orthogroups id as row names}
 }
 \description{
 \code{plot_keyword} is a wrapper for \code{\link{plot_all_stages}} that applies this

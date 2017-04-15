@@ -238,7 +238,8 @@ Moreover, the function `add_fit()` requires data on how the columns are grouped 
 
 ```{r}
 coldata <- data.frame(spc = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][1]),
-                      treat = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][2]))
+                      treat = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][2]),
+                      stringsAsFactors = FALSE)
 
 coldata
 ```
@@ -249,6 +250,24 @@ Now we can add the fit
 og_fit <- add_fit(dat = og_eset_log,
                   coldata = coldata,
                   design = ~ spc + treat + spc:treat) 
+```
+
+## Explore results
+
+The F-value for adding the interaction term to the linear model can be used can be used as a feature that ranks orthogroups in base of how likely they are to behave differently in between species
+
+```{r}
+og_fit <- og_fit[order(og_fit$`spc:treat`, decreasing = TRUE), ]
+```
+
+This is the highest ranked orthogroup
+
+```{r, fig.height=4, fig.width=5}
+plot_all_stages(orthogroup = rownames(og_fit)[1],
+                dset = og_eset_log,
+                species = coldata$spc,
+                condition = coldata$treat,
+                ylab = "Log Scaled TPM")
 ```
 
 ## Session info
