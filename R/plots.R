@@ -83,7 +83,9 @@ plot_og_genes <- function(ogroup,
 {
     ### There is an dicrepancy between ids in ogroups and expression matrix
     genes <- og_list[[ogroup]]
-    print(genes)
+    print(paste("the ", ogroup, " orthogroup contains ", length(genes), " genes: ",
+                paste(genes, collapse = ", "),
+                sep = ""))
     plot_gene <- function(gene, dset, cdata, ylab)
     {
         to_plot <- grep(gene, rownames(dset))
@@ -96,9 +98,7 @@ plot_og_genes <- function(ogroup,
         }
     }
     genes_spec1 <- genes[genes %in% rownames(eset_spec1)]
-    print(genes_spec1)
     genes_spec2 <- genes[genes %in% rownames(eset_spec2)]
-    print(genes_spec2)
     tmp <- sapply(genes_spec1, plot_gene,
                   dset = eset_spec1,
                   cdata = coldata_spec1,

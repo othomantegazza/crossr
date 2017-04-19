@@ -305,6 +305,50 @@ plot_og_genes(ogroup = rownames(og_fit)[1],
               ylab = "TPM")
 ```
 
+As we can see the orthogroup `r rownames(og_fit)[1]` contains only 2 genes, but we can expect orthogroups of different size and different ratios between genes from ine species and from the other.
+
+### Example, orthogroup OG0002779
+
+```{r}
+example_group <- "OG0002779"
+# also OG0000214 makes a good example
+```
+
+
+Orthogroup `r example_group` contains contains 4 genes, 2 from each species.
+
+The F-value associated to this group is `r og_fit[example_group, "spc:treat"]`, and it ranks `r which(rownames(og_fit) == example_group)` out of 500.
+
+Looks like it is behaving differently in response to heat in the 2 species;
+
+```{r, fig.height=4, fig.width=5}
+plot_all_stages(orthogroup = example_group,
+                dset = og_eset_log,
+                species = coldata$spc,
+                condition = coldata$treat,
+                ylab = "Log Scaled TPM")
+```
+
+and it contains 4 genes of which one is behaving peculiarly differently than the others.
+
+```{r, fig.height=6, fig.width=6}
+par(mfrow = c(2, 2))
+plot_og_genes(ogroup = example_group,
+              og_list = ogroups,
+              eset_spec1 = thaliana,
+              eset_spec2 = lyrata,
+              coldata_spec1 = cdata_thaliana,
+              coldata_spec2 = cdata_lyrata,
+              ylab = "TPM")
+```
+
+## Clusters
+
+Ranking orthogroups by F-value of the interaction term and arbitrary cutoffs can be useful to detect genes that behave differently in the two species, but in this way we select genes that behave differently in any way.
+
+Clusters and heatmap can be useful in order to group together orthogroups that behave differently in a similar way and to make sense of it all.
+
+
 
 ## Session info
 
