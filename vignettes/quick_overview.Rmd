@@ -174,9 +174,6 @@ again, first for *A. thaliana*
 thaliana_og <- collapse_orthologs(eset = thaliana,
                                   ogroups = ogroups,
                                   mc.cores = 4)
-head(thaliana_og)
-tail(thaliana_og)
-summary(thaliana_og)
 ```
 
 and then for *A.lyrata*
@@ -185,9 +182,7 @@ and then for *A.lyrata*
 lyrata_og <- collapse_orthologs(eset = lyrata,
                                   ogroups = ogroups,
                                   mc.cores = 4)
-head(lyrata_og)
-tail(lyrata_og)
-summary(lyrata_og)
+
 ```
 
 Not all orthogroups contain genes from both species, indeed both orthogroup expression datasets contain `NA` values. We can `merge` the datasets and remove the lines that contain `NA`
@@ -223,15 +218,7 @@ I suggest to run `add_fit()` on log scaled TPMs.
 
 ```{r}
 og_eset_log <- log(og_eset + 1)
-# colnames(og_eset_log)
-# 
-# colnames(og_eset_log)[1:6] <- paste("thal",
-#                                     colnames(og_eset_log)[1:6],
-#                                     sep = "_")
-# colnames(og_eset_log)[7:12] <- paste("lyr",
-#                                     colnames(og_eset_log)[7:12],
-#                                     sep = "_")
-# colnames(og_eset_log) <- sapply(colnames(og_eset_log), function(i) strsplit(i, split = "\\.")[[1]][1]) 
+
 ```
 
 Moreover, the function `add_fit()` requires data on how the columns are grouped together.
@@ -254,13 +241,24 @@ og_fit <- add_fit(dat = og_eset_log,
 
 ## Explore results
 
-The F-value for adding the interaction term to the linear model can be used can be used as a feature that ranks orthogroups in base of how likely they are to behave differently in between species
+The F-value for adding the interaction term to the linear model can be used can be used as a feature that ranks orthogroups in base of how likely they are to behave differently in between species, therefore we can order the results in `og_fit` by the f-value for the interaction factor, which is in the column `spc:treat` (as indicated in the design supplied th `add_fit`) of the `og_fit`element itself.
 
 ```{r}
 og_fit <- og_fit[order(og_fit$`spc:treat`, decreasing = TRUE), ]
+head(og_fit)
 ```
 
-This is the highest ranked orthogroup
+### Explore orthogroup expression
+
+The function `plot_all_stages` can be used to plot a stripchart of the expression level of one orthogroups in all the samples.
+It requires as input:
+
+- the name of the orthogroup,
+- the dataset with the expression data (in this case I use the log scaled TPM values),
+- a vector or a factor that contains the **species information** for all the columns of the expression dataset,
+- a vector or a factor that contains the **condition information** for all the columns of the expression dataset,
+
+In this case I use it to plot the expression levels of the orthogroup `r rownames(og_fit)[1]` which ranks as the most differentially expressed.
 
 ```{r, fig.height=4, fig.width=5}
 plot_all_stages(orthogroup = rownames(og_fit)[1],
@@ -269,6 +267,44 @@ plot_all_stages(orthogroup = rownames(og_fit)[1],
                 condition = coldata$treat,
                 ylab = "Log Scaled TPM")
 ```
+
+This can be combined with faceting in order to plot the expression of multiple orthogroups. For example here I plot the top 12 differentially expressed orthogroups in a 4X3 faceting
+
+```{r, fig.height=9, fig.width=7}
+par(mfrow = c(4, 3))
+sapply(rownames(og_fit)[1:12],
+       plot_all_stages,
+       dset = og_eset_log,
+       species = coldata$spc,
+       condition = coldata$treat,
+       ylab = "Log Scaled TPM")
+```
+
+### Plot all the genes in one orthogroup
+
+The workflw of `crossr` relies on the assumption that:
+
+> all the genes in one orthogroup have the same function. 
+
+Therefore their exoression values can be added without this resulting in a misenterpretation of the activity of certain groups.
+
+This is a useful working assumption but it is not always verified, therefore I suggest, also, before drawing any conclusion, to explore also the expression pattern of the single genes contained in 1 orthogroup.
+
+This can be achieved with the function `plot_og_genes`.
+
+```{r}
+cdata_lyrata <- sapply(colnames(lyrata), function(i) strsplit(i, split = "_")[[1]][2])
+cdata_thaliana <- sapply(colnames(thaliana), function(i) strsplit(i, split = "_")[[1]][2])
+
+plot_og_genes(ogroup = rownames(og_fit)[1],
+              og_list = ogroups,
+              eset_spec1 = thaliana,
+              eset_spec2 = lyrata,
+              coldata_spec1 = cdata_thaliana,
+              coldata_spec2 = cdata_lyrata,
+              ylab = "TPM")
+```
+
 
 ## Session info
 

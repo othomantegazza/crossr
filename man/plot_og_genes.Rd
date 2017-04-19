@@ -4,10 +4,25 @@
 \alias{plot_og_genes}
 \title{plot the expression of all genes within one orthogroup}
 \usage{
-plot_og_genes(ogroup)
+plot_og_genes(ogroup, og_list, eset_spec1, eset_spec2, coldata_spec1,
+  coldata_spec2, ylab = "TPM")
 }
 \arguments{
-\item{ogroup}{a character string}
+\item{ogroup}{a character string with the orthogroup ID for the genes to plot}
+
+\item{og_list}{a \code{list} containing the mapping from orthogroups to genes}
+
+\item{eset_spec1}{the expression set for species 1 as \code{data.frame},
+it must contain the gene ID in the rownames}
+
+\item{eset_spec2}{the expression set for species 2 as \code{data.frame},
+it must contain the gene ID in the rownames}
+
+\item{coldata_spec1}{a \code{character} vector or a \code{factor} with the
+experimental condition for the samples in species 1}
+
+\item{coldata_spec2}{a \code{character} vector or a \code{factor} with the
+experimental condition for the samples in species 2}
 }
 \description{
 \code{plot_og_gene} is a wrapper for \code{stripchart} and plots a stripchart
