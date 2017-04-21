@@ -1,4 +1,4 @@
-require(testthat)
+# require(testthat)
 
 context("linear model and ANOVA work correctly")
 
