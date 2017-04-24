@@ -161,46 +161,57 @@ ogroups <- switch_ids(ogroups = ogroups,
                       mc.cores = 4)
 ```
 
+## Implement a S4 element
+
+Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together all the various expression set, annotoations and statistics that we have loaded and/or that we are going to produce.
+
+If reader want an introduction to S4 classes in R, I suggest this chapter from Hadley Wickham's advanced R book: http://adv-r.had.co.nz/S4.html
+
+The *crossr* package defines the S4 class `ogset` which can be created with thee `make_ogset` constructor function.
+
+```{r}
+og_set <-  make_ogset(og = ogroups,
+                       spec1_exp = thaliana,
+                       spec2_exp = lyrata)
+```
+
+The `ogset` class is made to store orthogroup expression, and it has slots for orthogroup expression, list of genes in orthogroups, single species expression data, design and annotation data. But not all these elements are not necessary when initialising the object with `make_ogset()`. The `ogset` class is modeled on Bioconductor Summarized experiment class.
+
+When the `ogset` element is initialized, the function `check_ogset()` is called in order to check if the elements of the object match with each others. In the specific, `check_ogset()` checks that:
+
+- The names of the orthogroups match the rownames of the orthogroup expression set `og_eset` (if any is given),
+- The row names of `colData` match the column names of the orthogroup expression set,
+- The row names of `rowData`match the row names of the orthogroup expression set.
+
+After adding new elements to an `ogset` object, one can check that the object is still valid by calling `check_ogset()` which returns TRUE if the object is valid.
+
+```{r}
+check_ogset(og_set)
+```
+
+
 ## Collapse orthologues
 
-As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A *quick and dirty* solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
+As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A "quick and dirty"" solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
 
-The basic **assumption** of this method is that genes in the same orthogroup have the same function
+The basic **assumption** of this method is that **genes in the same orthogroup have the same function**.
 
-The function `collapse_orthogroups()`performs this task.
+The function `collapse_orthologs()`performs this task on the `ogset` class elements, and returns the same element with the collapsed orthogroup expression set in the designated slot.
 
-again, first for *A. thaliana*
 ```{r}
-thaliana_og <- collapse_orthologs(eset = thaliana,
-                                  ogroups = ogroups,
-                                  mc.cores = 4)
+og_set <- collapse_orthologs(og_set, mc.cores = 4)
 ```
 
-and then for *A.lyrata*
+Not all orthogroups contain genes from both species, the orthogroups that contain genes and hence expression data from both species are stored in the slot `og_exp` for further analysis,
 
 ```{r}
-lyrata_og <- collapse_orthologs(eset = lyrata,
-                                  ogroups = ogroups,
-                                  mc.cores = 4)
-
+str(og_set@og_exp)
 ```
 
-Not all orthogroups contain genes from both species, indeed both orthogroup expression datasets contain `NA` values. We can `merge` the datasets and remove the lines that contain `NA`
+the ones that does not are stored in the slot `og_nomatch`
 
 ```{r}
-og_eset <- merge(thaliana_og, lyrata_og,
-                 by = "row.names", all = TRUE)
-rownames(og_eset) <- og_eset$Row.names; og_eset$Row.names <- NULL
-```
-
-While removing `NA`, the orthogroups that are not represented in both species can be saved for later analyses
-
-```{r}
-og_NOMATCH <- og_eset[!complete.cases(og_eset), ]
-dim(og_NOMATCH)
-
-og_eset <- og_eset[complete.cases(og_eset), ]
-dim(og_eset)
+str(og_set@og_nomatch)
 ```
 
 

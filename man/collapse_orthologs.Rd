@@ -2,25 +2,21 @@
 % Please edit documentation in R/wranglers.R
 \name{collapse_orthologs}
 \alias{collapse_orthologs}
-\title{Sum Expression of Orthologs}
+\title{Sum Expression of Orthologs in an ogset class elements}
 \usage{
-collapse_orthologs(eset, ogroups, mc.cores = 1)
+collapse_orthologs(og_set, mc.cores)
 }
 \arguments{
-\item{ogroups}{a \code{list} of orthogroups, the gene names in the list should match the \code{row.names} of the datasets}
-
 \item{mc.cores}{\code{numeric}, the number of threads}
 
-\item{eset1}{a \code{data.frame} with the a gene-wise  or transcript-wise expression matrix}
+\item{ogset}{a \code{ogset} class element}
 }
 \description{
-\code{collapse_orthologs} takes an expression matrix and a list of orthogroups.
+#' \code{collapse_orthologs} takes ogset class element as input
 It sums the expression of all the genes in one orthogroup across the samples
-and outputs a orthogroup-wise expression matrix
+and outputs an ogset class element containing the orthologs expression matrix
 }
 \details{
-Some step are considerably slow and are parallelized with the function
+#' Some step are considerably slow and are parallelized with the function
 \code{mclapply} from the package \code{parallel} the number of threads defaults to 1.
-The gene/transcripts IDs in the orthogroups are searched for a match in the \code{rownames}
-of the expressiom matrix using \code{\link{grep}}
 }

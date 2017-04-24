@@ -1,6 +1,6 @@
 #' Sum Expression of Orthologs
 #'
-#' \code{collapse_orthologs} takes an expression matrix and a list of orthogroups.
+#' \code{sum_groups} takes an expression matrix and a list of orthogroups.
 #' It sums the expression of all the genes in one orthogroup across the samples
 #' and outputs a orthogroup-wise expression matrix
 #'
@@ -13,7 +13,7 @@
 #' @param ogroups a \code{list} of orthogroups, the gene names in the list should match the \code{row.names} of the datasets
 #' @param mc.cores \code{numeric}, the number of threads
 
-collapse_orthologs <- function(eset, ogroups, mc.cores = 1)
+sum_groups <- function(eset, ogroups, mc.cores = 1)
 {
 
     ogroups_es <- parallel::mclapply(ogroups, function(i) eset[ grep( paste( i, collapse = "|" ), rownames(eset)), ] ,
@@ -25,6 +25,42 @@ collapse_orthologs <- function(eset, ogroups, mc.cores = 1)
                                      mc.cores = mc.cores)
     ogroups_es <- do.call(rbind, ogroups_es)
     return(ogroups_es)
+}
+
+#' Sum Expression of Orthologs in an ogset class elements
+#'
+#' #' \code{collapse_orthologs} takes ogset class element as input
+#' It sums the expression of all the genes in one orthogroup across the samples
+#' and outputs an ogset class element containing the orthologs expression matrix
+#'
+#'#' Some step are considerably slow and are parallelized with the function
+#' \code{mclapply} from the package \code{parallel} the number of threads defaults to 1.
+#'
+#' @param ogset a \code{ogset} class element
+#' @param mc.cores \code{numeric}, the number of threads
+
+collapse_orthologs <- function(og_set, mc.cores)
+{
+    if(sum(dim(og_set@spec1_exp)) == 0 |
+       sum(dim(og_set@spec2_exp)) == 0 |
+       length(og_set@og) == 0) {
+        stop("the slots spec1_exp or spec1_exp or og are empty,
+             please fill these slot with gene-wise expression
+             data and orthogroup information before collapsing
+             orthogroups")
+    }
+    ogroups_es1 <- sum_groups(eset = og_set@spec1_exp,
+                              ogroups = og_set@og,
+                              mc.cores = mc.cores)
+    ogroups_es2 <- sum_groups(eset = og_set@spec2_exp,
+                              ogroups = og_set@og,
+                              mc.cores = mc.cores)
+    og_eset_df <- merge(ogroups_es1, ogroups_es2,
+                        by = "row.names", all = TRUE)
+    rownames(og_eset_df) <- og_eset_df$Row.names; og_eset_df$Row.names <- NULL
+    og_set@og_nomatch <- og_eset_df[!complete.cases(og_eset_df), ]
+    og_set@og_exp <- og_eset_df[complete.cases(og_eset_df), ]
+    return(og_set)
 }
 
 #' Converts Protein ID into Transcript ID in Orthogroup List
