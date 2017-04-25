@@ -182,6 +182,7 @@ When the `ogset` element is initialized, the function `check_ogset()` is called 
 - The names of the orthogroups match the rownames of the orthogroup expression set `og_eset` (if any is given),
 - The row names of `colData` match the column names of the orthogroup expression set,
 - The row names of `rowData`match the row names of the orthogroup expression set.
+- The variable in `design` are colnames of `colData`.
 
 After adding new elements to an `ogset` object, one can check that the object is still valid by calling `check_ogset()` which returns TRUE if the object is valid.
 
@@ -214,6 +215,12 @@ the ones that does not are stored in the slot `og_nomatch`
 str(og_set@og_nomatch)
 ```
 
+After we have modified the ogset element (anytime), we can check again for its consistency with the function `check_ogset()` (optional).
+
+```{r}
+check_ogset(og_set)
+```
+
 
 ## Select genes that behave differently between species
 
@@ -225,12 +232,49 @@ Also, since the data have gone through many transformation it is hard to make as
 
 The function that fits the linear model and performs ANOVA is called `add_fit()`
 
+First we have to add the column data (the information on the sample) to the ogset element and to provide it with details on the experimental design.
+
+The column data were previoulsy encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
+
+```{r}
+colnames(og_set@og_exp)
+```
+
+So I organize those info in a dataframe:
+
+```{r}
+coldata <- data.frame(spc = sapply(colnames(og_set@og_exp),
+                                   function(i) strsplit(i, split = "_")[[1]][1]),
+                      treat = sapply(colnames(og_set@og_exp),
+                                     function(i) strsplit(i, split = "_")[[1]][2]),
+                      stringsAsFactors = FALSE)
+
+coldata
+```
+
+And provide those information to the ogset element
+
+```{r}
+og_set@colData <- coldata
+check_ogset(og_set)
+```
+
+The experimental design must also be provided, indicating which variable to compare:
+
+```{r}
+og_set@design <- ~ spc + treat + spc:treat
+check_ogset(og_set)
+```
+
+
+
 I suggest to run `add_fit()` on log scaled TPMs.
 
 ```{r}
 og_eset_log <- log(og_eset + 1)
 
 ```
+
 
 Moreover, the function `add_fit()` requires data on how the columns are grouped together.
 

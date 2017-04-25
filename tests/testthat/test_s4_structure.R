@@ -35,3 +35,19 @@ test_that("check ogset tests for coldata and rowdata matching", {
                             og_exp = og_eset,
                             rowData = rowdata_WRONG))
 })
+
+test_that("check ogset for variable in design and coldata match", {
+    load(file = "tos4.Rdata")
+    coldata <- data.frame(spc = rep(1, 12),
+                          treat = rep(1, 12),
+                          stringsAsFactors = FALSE)
+    design <- ~ spc + treat + spc*treat
+    design_wrong <- ~ spc + that + spc*that
+
+    expect_s4_class(make_ogset(colData = coldata,
+                               design = design),
+                    "ogset")
+    expect_error(make_ogset(coldata = coldata,
+                            design = design_wrong))
+
+})

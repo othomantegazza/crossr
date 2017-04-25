@@ -20,12 +20,20 @@ check_ogset <- function(object) {
     }
 
     names_rows <- rownames(object@og_exp)
-    names_rowndata<- rownames(object@rowData)
+    names_rowndata <- rownames(object@rowData)
     if (!all(dim(object@rowData) == c(0,0))) {
         if(!all(names_rows == names_rowndata)) {
             msg <- "The row names of og_exp must match the row names of rowData"
             errors <- c(errors, msg)
-    }}
+        }}
+
+    cols_coldata <- colnames(object@colData)
+    vars <- all.vars(object@design)
+    if (length(vars) > 0 && !is.null(cols_coldata)) {
+        if (!all(vars %in% cols_coldata)) {
+            msg <- "The variables in design must be contained in the colnames of colData"
+            errors <- c(errors, msg)
+        }}
 
     if (length(errors) == 0) TRUE else errors
 }
