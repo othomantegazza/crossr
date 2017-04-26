@@ -1,11 +1,11 @@
-#' Add F-values From Linear Model to Orthologroup Expression Set
+#' Calculate F-values from a Linear Model on an Orthogroup Expression Set
 #'
 #' @param dat \code{data.frame} contains data for any gene
 #' @param coldata \code{data.frame} categorical variables with info for every samples
 #' @param design \code{formula}, encodes the assumption on how the variables in coldata
 #' explain the observed gene expression
 
-add_fit <- function(dat, coldata, design)
+make_fit <- function(dat, coldata, design)
 {
     vars <- all.vars(design)
     stopifnot(all(vars %in% colnames(coldata)))
@@ -25,27 +25,37 @@ add_fit <- function(dat, coldata, design)
                      fit_anova_int, dset = dat, coldata = coldata,
                      mc.cores = 4)
 
+
     names(fits) <- rownames(dat)
     fits <- as.data.frame(do.call(rbind, fits))
+    fits$Residuals <- NULL
 
-    dat_fit <- merge(dat, fits, by = "row.names"); rownames(dat_fit) <- dat_fit$Row.names; dat_fit$Row.names <- NULL
-    dat_fit$Residuals <- NULL
-    return(dat_fit)
+    return(fits)
+
 }
 
-if(FALSE) {
-    load("tests/testthat/sample_oges.Rdata")
-    require(devtools)
-    load_all()
-    coldata <- data.frame(spc = substr(colnames(dat), 1, 2),
-                          stg = substr(colnames(dat), 4, 4),
-                          row.names = colnames(dat))
-    tst1 <- add_fit(dat = dat, coldata = coldata, design = exp ~ 0 + spc + stg + spc:stg)
-    tst2 <- add_fit(dat = dat, coldata = coldata, design = . ~ 0 + spc + stg + spc:stg)
-    tst3 <- add_fit(dat = dat, coldata = coldata, design = ~ 0 + spc + stg + spc:stg)
+#' Estimates and Add F-values from a Linear Model to an og_set class element
+#'
+#' @param ogset a \code{ogset} class element
+#' @param log_scale logical, should the data be natural log trasnsformed before fitting the model? (actually \code{log(data + 1)} transformed)
+#'
+#' The info on the \code{log_scaled} parameters get stored in the metadata slot
 
+add_fit <- function(ogset, log_scale = FALSE)
+{
+    stopifnot(isS4(ogset))
 
-    dt_tst <- cbind(exp = dat[1, ], coldata)
-    fit1 <- lm(exp ~ 0 + spc + stg + spc:stg, data = dt_tst)
-    fit2 <- lm( ~ 0 + spc + stg + spc:stg, data = dt_tst)
+    if (log_scale) {
+        to_fit <- log(ogset@og_exp + 1)
+        ogset@metadata <- c(ogset@metadata, "fit performed on log scaled data")
+    } else {
+        to_fit <- ogset@og_exp
+        ogset@metadata <- c(ogset@metadata, "fit performed on not scaled data")
+    }
+
+    ogset@stats <- make_fit(dat = to_fit,
+                            coldata = ogset@colData,
+                            design = ogset@design)
+
+    return(ogset)
 }

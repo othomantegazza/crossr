@@ -2,18 +2,17 @@
 % Please edit documentation in R/linear_mod.R
 \name{add_fit}
 \alias{add_fit}
-\title{Add F-values From Linear Model to Orthologroup Expression Set}
+\title{Estimates and Add F-values from a Linear Model to an og_set class element}
 \usage{
-add_fit(dat, coldata, design)
+add_fit(ogset, log_scale = FALSE)
 }
 \arguments{
-\item{dat}{\code{data.frame} contains data for any gene}
+\item{ogset}{a \code{ogset} class element}
 
-\item{coldata}{\code{data.frame} categorical variables with info for every samples}
+\item{log_scale}{logical, should the data be natural log trasnsformed before fitting the model? (actually \code{log(data + 1)} transformed)
 
-\item{design}{\code{formula}, encodes the assumption on how the variables in coldata
-explain the observed gene expression}
+The info on the \code{log_scaled} parameters get stored in the metadata slot}
 }
 \description{
-Add F-values From Linear Model to Orthologroup Expression Set
+Estimates and Add F-values from a Linear Model to an og_set class element
 }

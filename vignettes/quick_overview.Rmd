@@ -232,6 +232,8 @@ Also, since the data have gone through many transformation it is hard to make as
 
 The function that fits the linear model and performs ANOVA is called `add_fit()`
 
+----------
+
 First we have to add the column data (the information on the sample) to the ogset element and to provide it with details on the experimental design.
 
 The column data were previoulsy encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
@@ -266,33 +268,17 @@ og_set@design <- ~ spc + treat + spc:treat
 check_ogset(og_set)
 ```
 
+----------
 
+Now we can calculate the F-values. 
 
-I suggest to run `add_fit()` on log scaled TPMs.
-
-```{r}
-og_eset_log <- log(og_eset + 1)
-
-```
-
-
-Moreover, the function `add_fit()` requires data on how the columns are grouped together.
+I would suggest to do so on log scaled value, since this should be more appropriate for studying relative changes. This could be done by passing the argument `log_scale = TRUE` to the `add_fit()` function (actually 1 is added to the data before natural log trasformation, so the transformation performed is `log(data + 1)`.
 
 ```{r}
-coldata <- data.frame(spc = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][1]),
-                      treat = sapply(colnames(og_eset_log), function(i) strsplit(i, split = "_")[[1]][2]),
-                      stringsAsFactors = FALSE)
-
-coldata
+og_set <- add_fit(ogset = og_set, log_scale = TRUE)
 ```
 
-Now we can add the fit
-
-```{r}
-og_fit <- add_fit(dat = og_eset_log,
-                  coldata = coldata,
-                  design = ~ spc + treat + spc:treat) 
-```
+The info on the `log_scale` parameter are stored in the `metadata` slot
 
 ## Explore results
 
