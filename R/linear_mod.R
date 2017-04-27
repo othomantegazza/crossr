@@ -59,3 +59,24 @@ add_fit <- function(ogset, log_scale = FALSE)
 
     return(ogset)
 }
+
+#' Extract Top Tags from Ogset Class Element
+#'
+#' @param ogset an ogset class element
+#' @param stat \code{character}, the name of the column of ogset@stat used as ranking feature
+#' @param n \code{numeric} how many tags should the function extract
+#'
+#' \code{get_top_tags} extract the top tags from an ogset class element and returns
+#' a named numeric vector with the top statistics and the ID of the associated elements
+#' (orthogroups ID)
+
+get_top_tags <- function(ogset, rank_stat, n = 100)
+{
+    if(nrow(ogset@stats) < 1) {stop("The stats slot is empty, please fill the stats slot
+                                   by running add_fit on the ogset class element")}
+    if(n < 1) stop("n must be a positive integer")
+    rankd <- ogset@stats[order(ogset@stats[[rank_stat]], decreasing = TRUE), ]
+    out <- rankd[[rank_stat]]
+    out <- setNames(out, rownames(rankd))
+    return(out[1:n])
+}

@@ -264,7 +264,7 @@ check_ogset(og_set)
 The experimental design must also be provided, indicating which variable to compare:
 
 ```{r}
-og_set@design <- ~ spc + treat + spc:treat
+og_set@design <- ~ 0 + spc + treat + spc:treat
 check_ogset(og_set)
 ```
 
@@ -282,12 +282,20 @@ The info on the `log_scale` parameter are stored in the `metadata` slot
 
 ## Explore results
 
-The F-value for adding the interaction term to the linear model can be used can be used as a feature that ranks orthogroups in base of how likely they are to behave differently in between species, therefore we can order the results in `og_fit` by the f-value for the interaction factor, which is in the column `spc:treat` (as indicated in the design supplied th `add_fit`) of the `og_fit`element itself.
+We have an F-value associated to any of the three terms in the design formula that we have supplied
 
 ```{r}
-og_fit <- og_fit[order(og_fit$`spc:treat`, decreasing = TRUE), ]
-head(og_fit)
+head(og_set@stats)
 ```
+
+The F statistic for adding the interaction term to the linear model (in this case `spc:treat`) can be used as a feature that ranks orthogroups in base of how likely they are to behave differently between different species. The ID of the orthogroups with the highest F-value can be extracted with the function `get_top_tags()`.
+
+```{r}
+tt <- get_top_tags(og_set, "spc:treat", 10)
+tt
+```
+
+`get_top_tags()` returns a named numeric vector containing both the id of the top orthogroups and their associated statistics.
 
 ### Explore orthogroup expression
 
@@ -295,11 +303,9 @@ The function `plot_all_stages` can be used to plot a stripchart of the expressio
 It requires as input:
 
 - the name of the orthogroup,
-- the dataset with the expression data (in this case I use the log scaled TPM values),
-- a vector or a factor that contains the **species information** for all the columns of the expression dataset,
-- a vector or a factor that contains the **condition information** for all the columns of the expression dataset,
-
-In this case I use it to plot the expression levels of the orthogroup `r rownames(og_fit)[1]` which ranks as the most differentially expressed.
+- the the ogset element,
+- the species encoding in the design formula (in this case `spc`)
+- the treatment encoding in the design formula (in this case `treat`)
 
 ```{r, fig.height=4, fig.width=5}
 plot_all_stages(orthogroup = rownames(og_fit)[1],
