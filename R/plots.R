@@ -9,16 +9,16 @@
 #' that contain the ogroup (if any), the F-value for the interaction term.
 #'
 #' @param orthogroup a \code{character} string
-#' @param dset a numeric \code{data.frame} with orthogroups id as row names
-#' @param species a \code{character} vector containing the species of the
-#'  samples in the columns of the dset
-#' @param condition a \code{character} vector containing the experimental
+#' @param ogset an ogset class element
+#' @param species a string used to encode the species info in
+#' the design formula
+#' @param condition a string used to encode the experimental
 #' conditions of the samples in the columns of the dset
 #' @param main the title of the plot
 
 
 plot_all_stages <- function(orthogroup,
-                            dset,
+                            ogset,
                             species,
                             condition,
                             main = "",
@@ -26,17 +26,20 @@ plot_all_stages <- function(orthogroup,
 {
     old_mar <- par()$mar
     on.exit(par(mar = old_mar))
-    stopifnot(ncol(dset) == length(species) && ncol(dset) == length(condition))
+    # stopifnot(ncol(dset) == length(species) && ncol(dset) == length(condition))
 
     # par(mar = c(5, 4, 8, 2))
 
-    spc_levels <- unique(species)
-    a_points <- split(dset[orthogroup, species == spc_levels[1], drop = TRUE],
-                       as.factor(condition[species == spc_levels[1]]))
+    spc_levels <- unique(ogset@colData[[species]])
+    spec_fac <- ogset@colData[[species]]
+    cond_fac <- ogset@colData[[condition]]
+    dset <- ogset@og_exp
+    a_points <- split(dset[orthogroup, spec_fac == spc_levels[1], drop = TRUE],
+                       as.factor(cond_fac[spec_fac == spc_levels[1]]))
     a_points <- lapply(a_points, unlist)
 
-    b_points <- split(dset[orthogroup, species == spc_levels[2], drop = TRUE],
-                      as.factor(condition[species == spc_levels[2]]))
+    b_points <- split(dset[orthogroup, spec_fac == spc_levels[2], drop = TRUE],
+                      as.factor(cond_fac[spec_fac == spc_levels[2]]))
     b_points <- lapply(b_points, unlist)
 
     stripchart(a_points,

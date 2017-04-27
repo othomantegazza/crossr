@@ -4,17 +4,17 @@
 \alias{plot_all_stages}
 \title{Plot the Expression of One Orthogroup in Both Species}
 \usage{
-plot_all_stages(orthogroup, dset, species, condition, main = "", ...)
+plot_all_stages(orthogroup, ogset, species, condition, main = "", ...)
 }
 \arguments{
 \item{orthogroup}{a \code{character} string}
 
-\item{dset}{a numeric \code{data.frame} with orthogroups id as row names}
+\item{ogset}{an ogset class element}
 
-\item{species}{a \code{character} vector containing the species of the
-samples in the columns of the dset}
+\item{species}{a string used to encode the species info in
+the design formula}
 
-\item{condition}{a \code{character} vector containing the experimental
+\item{condition}{a string used to encode the experimental
 conditions of the samples in the columns of the dset}
 
 \item{main}{the title of the plot}

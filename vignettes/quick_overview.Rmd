@@ -305,13 +305,13 @@ It requires as input:
 - the name of the orthogroup,
 - the the ogset element,
 - the species encoding in the design formula (in this case `spc`)
-- the treatment encoding in the design formula (in this case `treat`)
+- the condition encoding in the design formula (in this case `treat`)
 
 ```{r, fig.height=4, fig.width=5}
-plot_all_stages(orthogroup = rownames(og_fit)[1],
-                dset = og_eset_log,
-                species = coldata$spc,
-                condition = coldata$treat,
+plot_all_stages(orthogroup = "OG0016450",
+                ogset = og_set,
+                species = "spc",
+                condition = "treat",
                 ylab = "Log Scaled TPM")
 ```
 
