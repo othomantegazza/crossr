@@ -318,12 +318,13 @@ plot_all_stages(orthogroup = "OG0016450",
 This can be combined with faceting in order to plot the expression of multiple orthogroups. For example here I plot the top 12 differentially expressed orthogroups in a 4X3 faceting
 
 ```{r, fig.height=9, fig.width=7}
+tt <- names(get_top_tags(og_set, "spc:treat", 12))
 par(mfrow = c(4, 3))
-sapply(rownames(og_fit)[1:12],
+sapply(tt,
        plot_all_stages,
-       dset = og_eset_log,
-       species = coldata$spc,
-       condition = coldata$treat,
+       ogset = og_set,
+       species = "spc",
+       condition = "treat",
        ylab = "Log Scaled TPM")
 ```
 

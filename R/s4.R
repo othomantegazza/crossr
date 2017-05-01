@@ -2,6 +2,12 @@
 # http://stackoverflow.com/search?tab=votes&q=user%3a547331%20%5bs4%5d%20is%3aanswe
 # library(methods)
 
+#' Check Validity of an \code{ogset} class element
+#'
+#' @param object an \code{ogset} class element
+#'
+#' @export
+
 check_ogset <- function(object) {
     errors <- character()
 

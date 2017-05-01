@@ -40,6 +40,8 @@ make_fit <- function(dat, coldata, design)
 #' @param log_scale logical, should the data be natural log trasnsformed before fitting the model? (actually \code{log(data + 1)} transformed)
 #'
 #' The info on the \code{log_scaled} parameters get stored in the metadata slot
+#'
+#' @export
 
 add_fit <- function(ogset, log_scale = FALSE)
 {
@@ -69,6 +71,8 @@ add_fit <- function(ogset, log_scale = FALSE)
 #' \code{get_top_tags} extract the top tags from an ogset class element and returns
 #' a named numeric vector with the top statistics and the ID of the associated elements
 #' (orthogroups ID)
+#'
+#' @export
 
 get_top_tags <- function(ogset, rank_stat, n = 100)
 {

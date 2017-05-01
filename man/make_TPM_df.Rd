@@ -7,7 +7,8 @@
 make_TPM_df(path)
 }
 \arguments{
-\item{path}{character string, the path for the folder that contains the Salmon results for all the samples}
+\item{path}{character string, the path for the folder that contains the Salmon results
+for all the samples}
 }
 \description{
 \code{Make_TPM_df} is a wrapper for \code{\link{get_TPM}}, it takes as input the path

@@ -5,6 +5,7 @@
 #'
 #' @param path a character string, the path to the (quant.sf) Salmon output
 
+
 get_TPM <- function(path) {
     stopifnot(grepl("quant.sf$", path))
     TPM <- read.csv(file = path,
@@ -19,7 +20,10 @@ get_TPM <- function(path) {
 #' for the folder that contain the Salmon output folders for all your sample and returns
 #' the TPM expression matrix as a \code{data.frame} object
 #'
-#' @param path character string, the path for the folder that contains the Salmon results for all the samples
+#' @param path character string, the path for the folder that contains the Salmon results
+#' for all the samples
+#'
+#' @export
 
 make_TPM_df <- function(path) {
     stopifnot(is.character(path) & length(path) == 1)
@@ -71,6 +75,8 @@ make_TPM_df <- function(path) {
 #' @section Note: \url{https://github.com/davidemms/OrthoFinder}; Emms, D.M. and Kelly, S. (2015)
 #' OrthoFinder: solving fundamental biases in whole genome comparisons dramatically improves orthogroup
 #' inference accuracy, Genome Biology 16:157
+#'
+#' @export
 
 parse_orthogroups <- function(path_2_ogroups)
 {

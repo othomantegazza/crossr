@@ -15,6 +15,8 @@
 #' @param condition a string used to encode the experimental
 #' conditions of the samples in the columns of the dset
 #' @param main the title of the plot
+#'
+#' @export
 
 
 plot_all_stages <- function(orthogroup,
@@ -74,6 +76,8 @@ plot_all_stages <- function(orthogroup,
 #'  experimental condition for the samples in species 1
 #' @param coldata_spec2 a \code{character} vector or a \code{factor} with the
 #'  experimental condition for the samples in species 2
+#'
+#' @export
 
 
 plot_og_genes <- function(ogroup,
@@ -137,6 +141,8 @@ plot_keyword <- function(keyword, dset, clusters)
 #'
 #' @param groups a \code{list} of orthogroups
 #' @param main an overall title for the plot
+#'
+#' @export
 
 explore_ogroups <- function(groups, main = "dimension of orthogroups")
 {

@@ -38,6 +38,8 @@ sum_groups <- function(eset, ogroups, mc.cores = 1)
 #'
 #' @param ogset a \code{ogset} class element
 #' @param mc.cores \code{numeric}, the number of threads
+#'
+#' @export
 
 collapse_orthologs <- function(og_set, mc.cores)
 {
@@ -106,6 +108,8 @@ px_2_tx <- function(ogroups,
 #' @param tx_id a \code{character} string indicating the name of the column of transcript ids in the annotation file
 #' @param px_id a \code{character} string indicating the name of the column of protein ids in the annotation file
 #' @param mc.cores \code{numeric}, the number of threads used for \code{mclapply}
+#'
+#' @export
 
 switch_ids <- function(ogroups, ids_table, px_id, tx_id, mc.cores = 1)
 {
