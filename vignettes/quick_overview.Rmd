@@ -183,8 +183,43 @@ When the `ogset` element is initialized, the function `check_ogset()` is called 
 - The row names of `colData` match the column names of the orthogroup expression set,
 - The row names of `rowData`match the row names of the orthogroup expression set.
 - The variable in `design` are colnames of `colData`.
+- The sample information (colData) of the two species expression dataframes contain the same experimental variables.
 
 After adding new elements to an `ogset` object, one can check that the object is still valid by calling `check_ogset()` which returns TRUE if the object is valid.
+
+```{r}
+check_ogset(og_set)
+```
+
+### Save sample information (colData) in the ogset element
+
+We specify the sample information in the `spec1_colData` and `spec2_colData` slots of the `ogset` element.
+
+In this case we have already expressed the sample information in the colnames of the two datasets, and we can use that to specify very basic colData, but more complex and detailed sample information can be provided.
+
+```{r}
+colnames(og_set@spec1_exp)
+colnames(og_set@spec2_exp)
+
+coldata_spec1 <- sapply(colnames(og_set@spec1_exp), function(i) strsplit(i, split = "_")[[1]][2])
+coldata_spec1 <- data.frame(treat = coldata_spec1, stringsAsFactors = FALSE)
+coldata_spec1
+
+coldata_spec2 <- sapply(colnames(og_set@spec2_exp), function(i) strsplit(i, split = "_")[[1]][2])
+coldata_spec2 <- data.frame(treat = coldata_spec2, stringsAsFactors = FALSE)
+coldata_spec2
+
+og_set@spec1_colData <- coldata_spec1
+og_set@spec2_colData <- coldata_spec1
+``` 
+
+then we have to provide information on which column of the `coldata_spec` datasets contains the main information for the experimental condition that is used to compare the two species. The levels of this column must be the same for both datasets; which means that we are testing for the response to the same experimental condition in the two species.
+
+```{r}
+og_set@exp_cond <- "treat"
+```
+
+and we can check that the ogset element is still valid
 
 ```{r}
 check_ogset(og_set)

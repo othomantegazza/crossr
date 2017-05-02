@@ -51,3 +51,65 @@ test_that("check ogset for variable in design and coldata match", {
                             design = design_wrong))
 
 })
+
+test_that("check consistency of species colData", {
+    load(file = "tos4.Rdata")
+
+    coldata_ly <- data.frame(treat = rep(c("a", "b", "c"),
+                                         each = 2),
+                             stringsAsFactors = FALSE)
+    rownames(coldata_ly) <- colnames(lyrata)
+
+    coldata_th <- data.frame(treat = rep(c("a", "b", "c"),
+                                         each = 2),
+                             stringsAsFactors = FALSE)
+    rownames(coldata_th) <- colnames(thaliana)
+
+    expect_s4_class(make_ogset(spec1_exp = lyrata,
+                               spec2_exp = thaliana,
+                               spec1_colData = coldata_ly,
+                               spec2_colData = coldata_th),
+                    "ogset")
+
+    ## test: check for spec1 consistency
+    coldata_ly_WRONG <- rbind(coldata_ly, bye = "bye")
+    expect_error(make_ogset(spec1_exp = lyrata,
+                            spec2_exp = thaliana,
+                            spec1_colData = coldata_ly_WRONG,
+                            spec2_colData = coldata_th))
+
+    coldata_ly_WRONG2 <- rbind(coldata_ly[1:5, , drop = FALSE], bye = "bye")
+    expect_error(make_ogset(spec1_exp = lyrata,
+                            spec2_exp = thaliana,
+                            spec1_colData = coldata_ly_WRONG2,
+                            spec2_colData = coldata_th))
+
+    ## test: check for spec2 consistency
+    coldata_th_WRONG <- rbind(coldata_th, bye = "bye")
+    expect_error(make_ogset(spec1_exp = lyrata,
+                            spec2_exp = thaliana,
+                            spec1_colData = coldata_ly,
+                            spec2_colData = coldata_th_WRONG))
+
+    coldata_th_WRONG2 <- rbind(coldata_th[1:5, , drop = FALSE], bye = "bye")
+    expect_error(make_ogset(spec1_exp = lyrata,
+                            spec2_exp = thaliana,
+                            spec1_colData = coldata_ly,
+                            spec2_colData = coldata_th_WRONG2))
+
+    ## test: check for exp_cond length and consistency
+    exp_cond <- "treat"
+    expect_s4_class(make_ogset(spec1_exp = lyrata,
+                               spec2_exp = thaliana,
+                               spec1_colData = coldata_ly,
+                               spec2_colData = coldata_th,
+                               exp_cond = exp_cond), "ogset")
+
+    exp_cond_WRONG <- c("treat", "spc")
+    expect_error(make_ogset(exp_cond = exp_cond_WRONG))
+
+    coldata_th_WRONG <- rbind(coldata_th, bye = "bye")
+    expect_error(make_ogset(spec1_colData = coldata_ly,
+                            spec2_colData = coldata_th_WRONG,
+                            exp_cond = exp_cond))
+})
