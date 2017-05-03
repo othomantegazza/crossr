@@ -343,7 +343,8 @@ It requires as input:
 - the condition encoding in the design formula (in this case `treat`)
 
 ```{r, fig.height=4, fig.width=5}
-plot_all_stages(orthogroup = "OG0016450",
+top_group <- names(get_top_tags(og_set, "spc:treat", 1))
+plot_all_stages(orthogroup = top_group,
                 ogset = og_set,
                 species = "spc",
                 condition = "treat",
@@ -376,19 +377,12 @@ This is a useful working assumption but it is not always verified, therefore I s
 This can be achieved with the function `plot_og_genes`.
 
 ```{r}
-cdata_lyrata <- sapply(colnames(lyrata), function(i) strsplit(i, split = "_")[[1]][2])
-cdata_thaliana <- sapply(colnames(thaliana), function(i) strsplit(i, split = "_")[[1]][2])
-
-plot_og_genes(ogroup = rownames(og_fit)[1],
-              og_list = ogroups,
-              eset_spec1 = thaliana,
-              eset_spec2 = lyrata,
-              coldata_spec1 = cdata_thaliana,
-              coldata_spec2 = cdata_lyrata,
+plot_og_genes(ogroup = top_group,
+              ogset = og_set,
               ylab = "TPM")
 ```
 
-As we can see the orthogroup `r rownames(og_fit)[1]` contains only 2 genes, but we can expect orthogroups of different size and different ratios between genes from ine species and from the other.
+As we can see the orthogroup `r top_group` contains only 2 genes, but we can expect orthogroups of different size and different ratios between genes from ine species and from the other.
 
 ### Example, orthogroup OG0002779
 
@@ -400,15 +394,15 @@ example_group <- "OG0002779"
 
 Orthogroup `r example_group` contains contains 4 genes, 2 from each species.
 
-The F-value associated to this group is `r og_fit[example_group, "spc:treat"]`, and it ranks `r which(rownames(og_fit) == example_group)` out of 500.
+The F-value associated to this group is `r og_set@stats[example_group, "spc:treat"]`, and it ranks `r which(names(get_top_tags(og_set, "spc:treat", Inf)) == example_group)` out of 500 groups.
 
 Looks like it is behaving differently in response to heat in the 2 species;
 
 ```{r, fig.height=4, fig.width=5}
 plot_all_stages(orthogroup = example_group,
-                dset = og_eset_log,
-                species = coldata$spc,
-                condition = coldata$treat,
+                ogset = og_set,
+                species = "spc",
+                condition = "treat",
                 ylab = "Log Scaled TPM")
 ```
 
@@ -417,11 +411,7 @@ and it contains 4 genes of which one is behaving peculiarly differently than the
 ```{r, fig.height=6, fig.width=6}
 par(mfrow = c(2, 2))
 plot_og_genes(ogroup = example_group,
-              og_list = ogroups,
-              eset_spec1 = thaliana,
-              eset_spec2 = lyrata,
-              coldata_spec1 = cdata_thaliana,
-              coldata_spec2 = cdata_lyrata,
+              ogset = og_set,
               ylab = "TPM")
 ```
 

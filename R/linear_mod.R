@@ -72,6 +72,8 @@ add_fit <- function(ogset, log_scale = FALSE)
 #' a named numeric vector with the top statistics and the ID of the associated elements
 #' (orthogroups ID)
 #'
+#' if \code{n} is \code{Inf}, the function return all the tags ranked by the ranking statistics
+#'
 #' @export
 
 get_top_tags <- function(ogset, rank_stat, n = 100)
@@ -79,8 +81,13 @@ get_top_tags <- function(ogset, rank_stat, n = 100)
     if(nrow(ogset@stats) < 1) {stop("The stats slot is empty, please fill the stats slot
                                    by running add_fit on the ogset class element")}
     if(n < 1) stop("n must be a positive integer")
+    if(n > nrow(ogset@stats) && is.finite(n)) stop(paste0("n is too high, the ranking statistic is available only for ",
+                                           nrow(ogset@stats),
+                                           " genes"))
     rankd <- ogset@stats[order(ogset@stats[[rank_stat]], decreasing = TRUE), ]
     out <- rankd[[rank_stat]]
     out <- setNames(out, rownames(rankd))
-    return(out[1:n])
+    if(is.infinite(n)) {
+        return(out)
+        } else {return(out[1:n])}
 }

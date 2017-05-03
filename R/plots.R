@@ -60,36 +60,24 @@ plot_all_stages <- function(orthogroup,
            lty = c(2, 3), bty = "n")
 }
 
-#' plot the expression of all genes within one orthogroup
+#' Plot the Expression of all Genes within one Orthogroup
 #'
 #' \code{plot_og_gene} is a wrapper for \code{stripchart} and plots a stripchart
 #' of the expression of all the gene within a orthogroup for each species in which
-#' expression data are available
+#' expression data are available.
 #'
-#' @param ogroup a character string with the orthogroup ID for the genes to plot
-#' @param og_list a \code{list} containing the mapping from orthogroups to genes
-#' @param eset_spec1 the expression set for species 1 as \code{data.frame},
-#'  it must contain the gene ID in the rownames
-#' @param eset_spec2 the expression set for species 2 as \code{data.frame},
-#' it must contain the gene ID in the rownames
-#' @param coldata_spec1 a \code{character} vector or a \code{factor} with the
-#'  experimental condition for the samples in species 1
-#' @param coldata_spec2 a \code{character} vector or a \code{factor} with the
-#'  experimental condition for the samples in species 2
+#' @param ogroup a character string with the ID of the orthogroups that contains
+#' the genes to be plotted
+#' @param ogset an ogset class element
+#' @param ylab a character string, the name of the y-axis in the plots
 #'
 #' @export
 
-
 plot_og_genes <- function(ogroup,
-                          og_list,
-                          eset_spec1,
-                          eset_spec2,
-                          coldata_spec1,
-                          coldata_spec2,
+                          ogset,
                           ylab = "TPM")
 {
-    ### There is an dicrepancy between ids in ogroups and expression matrix
-    genes <- og_list[[ogroup]]
+    genes <- ogset@og[[ogroup]]
     print(paste("the ", ogroup, " orthogroup contains ", length(genes), " genes: ",
                 paste(genes, collapse = ", "),
                 sep = ""))
@@ -97,24 +85,27 @@ plot_og_genes <- function(ogroup,
     {
         to_plot <- grep(gene, rownames(dset))
         if(length(to_plot) > 0) {
-        stripchart(as.numeric(dset[to_plot, ]) ~ cdata,
-                   vertical = TRUE, method = "jitter",
-                   pch = 16, col = "blue",
-                   main = gene, ylab = ylab)
-        grid()
+            stripchart(as.numeric(dset[to_plot, ]) ~ cdata,
+                       vertical = TRUE, method = "jitter",
+                       pch = 16, col = "blue",
+                       main = gene, ylab = ylab)
+            grid()
         }
     }
-    genes_spec1 <- genes[genes %in% rownames(eset_spec1)]
-    genes_spec2 <- genes[genes %in% rownames(eset_spec2)]
-    tmp <- sapply(genes_spec1, plot_gene,
-                  dset = eset_spec1,
-                  cdata = coldata_spec1,
+    genes_spec1 <- genes[genes %in% rownames(ogset@spec1_exp)]
+    genes_spec2 <- genes[genes %in% rownames(ogset@spec2_exp)]
+    tmp <- sapply(genes_spec1,
+                  plot_gene,
+                  dset = ogset@spec1_exp,
+                  cdata = ogset@spec1_colData[[ogset@exp_cond]],
                   ylab = ylab)
-    tmp <- sapply(genes_spec2, plot_gene,
-                  dset = eset_spec2,
-                  cdata = coldata_spec2,
+    tmp <- sapply(genes_spec2,
+                  plot_gene,
+                  dset = ogset@spec2_exp,
+                  cdata = ogset@spec2_colData[[ogset@exp_cond]],
                   ylab = ylab)
 }
+
 
 #' Plot the Expression of Every Orthogroup that Contains a Keyword in their Annos
 #'
@@ -130,7 +121,6 @@ plot_og_genes <- function(ogroup,
 
 plot_keyword <- function(keyword, dset, clusters)
 {
-
     to_plot <- rownames(dset[grep(keyword, dat_fit_log$annos_th), ])
     sapply(to_plot, plot_all_stages, dset = dset, clusters = clusters)
 }
