@@ -13,7 +13,9 @@ get_top_tags(ogset, rank_stat, n = 100)
 
 \code{get_top_tags} extract the top tags from an ogset class element and returns
 a named numeric vector with the top statistics and the ID of the associated elements
-(orthogroups ID)}
+(orthogroups ID)
+
+if \code{n} is \code{Inf}, the function return all the tags ranked by the ranking statistics}
 
 \item{stat}{\code{character}, the name of the column of ogset@stat used as ranking feature}
 }

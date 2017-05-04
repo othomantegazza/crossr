@@ -6,6 +6,3 @@ test_that("output of get_TPM is a 1 numeric column data.frame", {
     expect_equal(class(get_TPM("../../inst/exdata/quant.sf")$TPM), "numeric")
 })
 
-test_that("output of get_TPM is data.frame", {
-    expect_equal(class(make_TPM_df("../../inst/exdata")) , "data.frame")
-})

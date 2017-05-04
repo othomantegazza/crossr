@@ -2,30 +2,20 @@
 % Please edit documentation in R/plots.R
 \name{plot_og_genes}
 \alias{plot_og_genes}
-\title{plot the expression of all genes within one orthogroup}
+\title{Plot the Expression of all Genes within one Orthogroup}
 \usage{
-plot_og_genes(ogroup, og_list, eset_spec1, eset_spec2, coldata_spec1,
-  coldata_spec2, ylab = "TPM")
+plot_og_genes(ogroup, ogset, ylab = "TPM")
 }
 \arguments{
-\item{ogroup}{a character string with the orthogroup ID for the genes to plot}
+\item{ogroup}{a character string with the ID of the orthogroups that contains
+the genes to be plotted}
 
-\item{og_list}{a \code{list} containing the mapping from orthogroups to genes}
+\item{ogset}{an ogset class element}
 
-\item{eset_spec1}{the expression set for species 1 as \code{data.frame},
-it must contain the gene ID in the rownames}
-
-\item{eset_spec2}{the expression set for species 2 as \code{data.frame},
-it must contain the gene ID in the rownames}
-
-\item{coldata_spec1}{a \code{character} vector or a \code{factor} with the
-experimental condition for the samples in species 1}
-
-\item{coldata_spec2}{a \code{character} vector or a \code{factor} with the
-experimental condition for the samples in species 2}
+\item{ylab}{a character string, the name of the y-axis in the plots}
 }
 \description{
 \code{plot_og_gene} is a wrapper for \code{stripchart} and plots a stripchart
 of the expression of all the gene within a orthogroup for each species in which
-expression data are available
+expression data are available.
 }
