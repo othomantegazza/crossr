@@ -17,7 +17,10 @@ RoxygenNote: 6.0.1
 Imports:
     stringr (>= 1.2.0),
 		parallel (>= 3.3.3),
-		methods (>= 3.3.3)
+		methods (>= 3.3.3),
+		stats,
+		utils,
+		graphics
 Suggests:
     testthat (>= 1.0.2),
     knitr (>= 1.15.1),

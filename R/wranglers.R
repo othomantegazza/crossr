@@ -60,8 +60,8 @@ collapse_orthologs <- function(og_set, mc.cores)
     og_eset_df <- merge(ogroups_es1, ogroups_es2,
                         by = "row.names", all = TRUE)
     rownames(og_eset_df) <- og_eset_df$Row.names; og_eset_df$Row.names <- NULL
-    og_set@og_nomatch <- og_eset_df[!complete.cases(og_eset_df), ]
-    og_set@og_exp <- og_eset_df[complete.cases(og_eset_df), ]
+    og_set@og_nomatch <- og_eset_df[!stats::complete.cases(og_eset_df), ]
+    og_set@og_exp <- og_eset_df[stats::complete.cases(og_eset_df), ]
     return(og_set)
 }
 
@@ -81,10 +81,10 @@ px_2_tx <- function(ogroups,
                     px_id,
                     mc.cores = 1)
 {
-    ids <- read.table(anno_file,
-                      sep = "\t", header = TRUE,
-                      stringsAsFactors = FALSE,
-                      quote = "")
+    ids <- utils::read.table(anno_file,
+                             sep = "\t", header = TRUE,
+                             stringsAsFactors = FALSE,
+                             quote = "")
     # head(th_ids)
     # tst <- th_dat[rownames(th_dat2) %in% th_ids$product_accession, ]; nrow(tst)
     # tst <- th_dat[!rownames(th_dat2) %in% th_ids$product_accession, ]; nrow(tst)

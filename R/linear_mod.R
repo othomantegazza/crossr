@@ -9,13 +9,13 @@ make_fit <- function(dat, coldata, design)
 {
     vars <- all.vars(design)
     stopifnot(all(vars %in% colnames(coldata)))
-    design <- as.formula(paste("exp", deparse(design)))
+    design <- stats::as.formula(paste("exp", deparse(design)))
     fit_anova_int <- function(ogroup, dset, coldata)
     {
         dat_temp <- t(dset)
         to_fit <- cbind(exp = dat_temp[, ogroup], coldata)
-        fit <- lm(formula = design, data = to_fit)
-        anova_of_fit <- anova(fit)
+        fit <- stats::lm(formula = design, data = to_fit)
+        anova_of_fit <- stats::anova(fit)
         out <- anova_of_fit$`F value`
         names(out) <- attributes(anova_of_fit)$row.names
         return(out)
@@ -86,7 +86,7 @@ get_top_tags <- function(ogset, rank_stat, n = 100)
                                            " genes"))
     rankd <- ogset@stats[order(ogset@stats[[rank_stat]], decreasing = TRUE), ]
     out <- rankd[[rank_stat]]
-    out <- setNames(out, rownames(rankd))
+    out <- stats::setNames(out, rownames(rankd))
     if(is.infinite(n)) {
         return(out)
         } else {return(out[1:n])}

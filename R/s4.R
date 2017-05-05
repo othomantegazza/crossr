@@ -2,6 +2,9 @@
 # http://stackoverflow.com/search?tab=votes&q=user%3a547331%20%5bs4%5d%20is%3aanswe
 # library(methods)
 
+#' @import methods
+NULL
+
 #' Check Validity of an \code{ogset} class element
 #'
 #' @param object an \code{ogset} class element
@@ -119,30 +122,3 @@ make_ogset <- setClass("ogset",
                                       og_nomatch = "data.frame"),
                        validity = check_ogset)
 
-# og_S4_set <- new("ogset",
-#                  og = ogroups,
-#                  og_exp = og_eset,
-#                  colData = coldata,
-#                  design = ~ spc + treat + spc:treat)
-
-
-# # tst og_set ----------------------------------------------------------------
-# og_eset_WRONG <- rbind(og_eset, spiripucci = seq_along(og_eset[1,]))
-# tail(og_eset_WRONG)
-#
-# coldata_WRONG <- coldata[sample(rownames(coldata)), ]
-# rowdata_WRONG <- data.frame(a = "A")
-# rownames(rowdata_WRONG)
-#
-# tst <- new("ogset",
-#            og = ogroups,
-#            og_exp = og_eset_WRONG,
-#            colData = coldata_WRONG,
-#            rowData = rowdata_WRONG,
-#            design = ~ spc + treat + spc:treat)
-#
-# og_S4_set[1:2, ]
-
-
-"a" %in%
-    "a"

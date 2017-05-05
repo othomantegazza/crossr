@@ -8,7 +8,7 @@
 
 get_TPM <- function(path) {
     stopifnot(grepl("quant.sf$", path))
-    TPM <- read.csv(file = path,
+    TPM <- utils::read.csv(file = path,
                     sep = "\t", row.names = "Name")[, "TPM", drop = FALSE]
     return(TPM)
 }

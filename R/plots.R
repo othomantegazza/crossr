@@ -26,8 +26,8 @@ plot_all_stages <- function(orthogroup,
                             main = "",
                             ...)
 {
-    old_mar <- par()$mar
-    on.exit(par(mar = old_mar))
+    old_mar <- graphics::par()$mar
+    on.exit(graphics::par(mar = old_mar))
     # stopifnot(ncol(dset) == length(species) && ncol(dset) == length(condition))
 
     # par(mar = c(5, 4, 8, 2))
@@ -44,20 +44,20 @@ plot_all_stages <- function(orthogroup,
                       as.factor(cond_fac[spec_fac == spc_levels[2]]))
     b_points <- lapply(b_points, unlist)
 
-    stripchart(a_points,
-               frame = FALSE, vertical = TRUE,
-               ylim = range(unlist(c(a_points, b_points))),
-               pch = 16, method = "jitter",
-               main = ifelse(main == "", orthogroup, main),
-               ...)
-    stripchart(b_points,
-               frame = FALSE, vertical = TRUE, add = TRUE,
-               pch = 17, method = "jitter")
-    lines(1:length(a_points), vapply(a_points, median, numeric(1)), lty = 2)
-    lines(1:length(b_points), vapply(b_points, median, numeric(1)), lty = 3)
-    legend("topright",
-           legend = c(spc_levels[1], spc_levels[2]),
-           lty = c(2, 3), bty = "n")
+    graphics::stripchart(a_points,
+                         frame = FALSE, vertical = TRUE,
+                         ylim = range(unlist(c(a_points, b_points))),
+                         pch = 16, method = "jitter",
+                         main = ifelse(main == "", orthogroup, main),
+                         ...)
+    graphics::stripchart(b_points,
+                         frame = FALSE, vertical = TRUE, add = TRUE,
+                         pch = 17, method = "jitter")
+    graphics::lines(1:length(a_points), vapply(a_points, stats::median, numeric(1)), lty = 2)
+    graphics::lines(1:length(b_points), vapply(b_points, stats::median, numeric(1)), lty = 3)
+    graphics::legend("topright",
+                     legend = c(spc_levels[1], spc_levels[2]),
+                     lty = c(2, 3), bty = "n")
 }
 
 #' Plot the Expression of all Genes within one Orthogroup
@@ -85,11 +85,11 @@ plot_og_genes <- function(ogroup,
     {
         to_plot <- grep(gene, rownames(dset))
         if(length(to_plot) > 0) {
-            stripchart(as.numeric(dset[to_plot, ]) ~ cdata,
-                       vertical = TRUE, method = "jitter",
-                       pch = 16, col = "blue",
-                       main = gene, ylab = ylab)
-            grid()
+            graphics::stripchart(as.numeric(dset[to_plot, ]) ~ cdata,
+                                 vertical = TRUE, method = "jitter",
+                                 pch = 16, col = "blue",
+                                 main = gene, ylab = ylab)
+            graphics::grid()
         }
     }
     genes_spec1 <- genes[genes %in% rownames(ogset@spec1_exp)]
@@ -137,8 +137,8 @@ plot_keyword <- function(keyword, dset, clusters)
 explore_ogroups <- function(groups, main = "dimension of orthogroups")
 {
     stopifnot(is.list(groups))
-    plot(table(sapply(groups, length)),
+    graphics::plot(table(sapply(groups, length)),
          frame = F, ylab = "number of groups",
          xlab = "genes per group", main = main)
-    grid()
+    graphics::grid()
 }
