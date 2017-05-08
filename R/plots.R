@@ -107,23 +107,6 @@ plot_og_genes <- function(ogroup,
 }
 
 
-#' Plot the Expression of Every Orthogroup that Contains a Keyword in their Annos
-#'
-#' \code{plot_keyword} is a wrapper for \code{\link{plot_all_stages}} that applies this
-#' function to all the orthogroups in the dataset that contain a user specified keyword
-#' in their functional annotation
-#'
-#' The function uses grep to search for the \code{keyword} in the functional annotation
-#' of the orthogroups
-#'
-#' @param keyword a character string
-#' @inheritParams plot_all_stages
-
-plot_keyword <- function(keyword, dset, clusters)
-{
-    to_plot <- rownames(dset[grep(keyword, dat_fit_log$annos_th), ])
-    sapply(to_plot, plot_all_stages, dset = dset, clusters = clusters)
-}
 
 #' Plot an Histogram og Orthogroup Dimension
 #'

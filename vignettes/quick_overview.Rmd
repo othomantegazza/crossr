@@ -415,6 +415,7 @@ plot_og_genes(ogroup = example_group,
               ylab = "TPM")
 ```
 
+
 ## Clusters
 
 Ranking orthogroups by F-value of the interaction term and arbitrary cutoffs can be useful to detect genes that behave differently in the two species, but in this way we select genes that behave differently in any way.
