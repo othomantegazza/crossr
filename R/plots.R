@@ -15,6 +15,7 @@
 #' @param condition a string used to encode the experimental
 #' conditions of the samples in the columns of the dset
 #' @param main the title of the plot
+#' @param ... arguments to be passed to \code{stripchart}
 #'
 #' @export
 

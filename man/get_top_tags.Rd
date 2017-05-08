@@ -9,6 +9,8 @@ get_top_tags(ogset, rank_stat, n = 100)
 \arguments{
 \item{ogset}{an ogset class element}
 
+\item{rank_stat}{\code{character}, the name of the column of ogset@stat used as ranking feature}
+
 \item{n}{\code{numeric} how many tags should the function extract
 
 \code{get_top_tags} extract the top tags from an ogset class element and returns
@@ -16,8 +18,6 @@ a named numeric vector with the top statistics and the ID of the associated elem
 (orthogroups ID)
 
 if \code{n} is \code{Inf}, the function return all the tags ranked by the ranking statistics}
-
-\item{stat}{\code{character}, the name of the column of ogset@stat used as ranking feature}
 }
 \description{
 Extract Top Tags from Ogset Class Element

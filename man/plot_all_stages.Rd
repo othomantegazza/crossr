@@ -18,6 +18,8 @@ the design formula}
 conditions of the samples in the columns of the dset}
 
 \item{main}{the title of the plot}
+
+\item{...}{arguments to be passed to \code{stripchart}}
 }
 \description{
 \code{plot_all_stages} is a wrapper for \code{stripchart} and plots a stripchart

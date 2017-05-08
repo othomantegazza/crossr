@@ -9,7 +9,7 @@
 #' The gene/transcripts IDs in the orthogroups are searched for a match in the \code{rownames}
 #' of the expressiom matrix using \code{\link{grep}}
 #'
-#' @param eset1 a \code{data.frame} with the a gene-wise  or transcript-wise expression matrix
+#' @param eset a \code{data.frame} with the a gene-wise  or transcript-wise expression matrix
 #' @param ogroups a \code{list} of orthogroups, the gene names in the list should match the \code{row.names} of the datasets
 #' @param mc.cores \code{numeric}, the number of threads
 
@@ -36,7 +36,7 @@ sum_groups <- function(eset, ogroups, mc.cores = 1)
 #'#' Some step are considerably slow and are parallelized with the function
 #' \code{mclapply} from the package \code{parallel} the number of threads defaults to 1.
 #'
-#' @param ogset a \code{ogset} class element
+#' @param og_set a \code{ogset} class element
 #' @param mc.cores \code{numeric}, the number of threads
 #'
 #' @export

@@ -7,11 +7,11 @@
 sum_groups(eset, ogroups, mc.cores = 1)
 }
 \arguments{
+\item{eset}{a \code{data.frame} with the a gene-wise  or transcript-wise expression matrix}
+
 \item{ogroups}{a \code{list} of orthogroups, the gene names in the list should match the \code{row.names} of the datasets}
 
 \item{mc.cores}{\code{numeric}, the number of threads}
-
-\item{eset1}{a \code{data.frame} with the a gene-wise  or transcript-wise expression matrix}
 }
 \description{
 \code{sum_groups} takes an expression matrix and a list of orthogroups.

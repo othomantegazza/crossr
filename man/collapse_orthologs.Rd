@@ -7,9 +7,9 @@
 collapse_orthologs(og_set, mc.cores)
 }
 \arguments{
-\item{mc.cores}{\code{numeric}, the number of threads}
+\item{og_set}{a \code{ogset} class element}
 
-\item{ogset}{a \code{ogset} class element}
+\item{mc.cores}{\code{numeric}, the number of threads}
 }
 \description{
 #' \code{collapse_orthologs} takes ogset class element as input

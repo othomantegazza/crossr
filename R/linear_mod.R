@@ -65,7 +65,7 @@ add_fit <- function(ogset, log_scale = FALSE)
 #' Extract Top Tags from Ogset Class Element
 #'
 #' @param ogset an ogset class element
-#' @param stat \code{character}, the name of the column of ogset@stat used as ranking feature
+#' @param rank_stat \code{character}, the name of the column of ogset@stat used as ranking feature
 #' @param n \code{numeric} how many tags should the function extract
 #'
 #' \code{get_top_tags} extract the top tags from an ogset class element and returns
