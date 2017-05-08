@@ -4,7 +4,7 @@
 \alias{make_fit}
 \title{Calculate F-values from a Linear Model on an Orthogroup Expression Set}
 \usage{
-make_fit(dat, coldata, design)
+make_fit(dat, coldata, design, mc.cores = 1)
 }
 \arguments{
 \item{dat}{\code{data.frame} contains data for any gene}
@@ -13,6 +13,8 @@ make_fit(dat, coldata, design)
 
 \item{design}{\code{formula}, encodes the assumption on how the variables in coldata
 explain the observed gene expression}
+
+\item{mc.cores}{the number of cores to be used in \code{parallel::mclapply}, defaults to 1}
 }
 \description{
 Calculate F-values from a Linear Model on an Orthogroup Expression Set

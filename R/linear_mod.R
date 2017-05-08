@@ -4,8 +4,12 @@
 #' @param coldata \code{data.frame} categorical variables with info for every samples
 #' @param design \code{formula}, encodes the assumption on how the variables in coldata
 #' explain the observed gene expression
+#' @param mc.cores the number of cores to be used in \code{parallel::mclapply}, defaults to 1
 
-make_fit <- function(dat, coldata, design)
+make_fit <- function(dat,
+                     coldata,
+                     design,
+                     mc.cores = 1)
 {
     vars <- all.vars(design)
     stopifnot(all(vars %in% colnames(coldata)))
@@ -23,7 +27,7 @@ make_fit <- function(dat, coldata, design)
 
     fits <- parallel::mclapply(rownames(dat),
                      fit_anova_int, dset = dat, coldata = coldata,
-                     mc.cores = 4)
+                     mc.cores = mc.cores)
 
 
     names(fits) <- rownames(dat)

@@ -65,39 +65,6 @@ collapse_orthologs <- function(og_set, mc.cores)
     return(og_set)
 }
 
-#' Converts Protein ID into Transcript ID in Orthogroup List
-#'
-#' Orthogroups are generated on protein sequence, \code{px_2_tx} converts protein ID to transcript ID in an orthogroup list
-#'
-#' @param ogroups a \code{list} of orthogroups
-#' @param anno_file a character string containing the path to the annotation file in tabulated format
-#' @param tx_id a \code{character} string indicating the name of the column of transcript ids in the annotation file
-#' @param px_id a \code{character} string indicating the name of the column of protein ids in the annotation file
-#' @param mc.cores \code{numeric}, the number of threads used for \code{mclapply}
-
-px_2_tx <- function(ogroups,
-                    anno_file,
-                    tx_id,
-                    px_id,
-                    mc.cores = 1)
-{
-    ids <- utils::read.table(anno_file,
-                             sep = "\t", header = TRUE,
-                             stringsAsFactors = FALSE,
-                             quote = "")
-    # head(th_ids)
-    # tst <- th_dat[rownames(th_dat2) %in% th_ids$product_accession, ]; nrow(tst)
-    # tst <- th_dat[!rownames(th_dat2) %in% th_ids$product_accession, ]; nrow(tst)
-    switch_ids <- function(id) {
-        if(id %in% as.character(ids[, px_id])) {
-            return(ids[which(as.character(ids[, px_id]) == id), tx_id])
-        } else return(id)
-    }
-    ogroups <- parallel::mclapply(ogroups, function(i) {
-        unname(sapply(i, switch_ids))},
-        mc.cores = mc.cores)
-    return(ogroups)
-}
 
 #' Utility for Converting Ids
 #'
