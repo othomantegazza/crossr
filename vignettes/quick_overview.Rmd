@@ -19,32 +19,32 @@ The package builds up on the output of [Salmon](https://combine-lab.github.io/sa
 
 In this vignette I replicate the crossr workflow on this dataset: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077), which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944)
 
-In order to make this Vignette lighter, the workflow is run here on a random subset of 500 orthogroups.
+In order to make this Vignette lighter, the workflow is run here on a random subset of 500 orthogroups. The example dataset are available in the exdata folder.
 
 ## Load Data
  
 The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the path to the folder that contains all the Salmon output subfolders for a species
 
 ```{r}
-list.files("../inst/exdata/thaliana")
+thaliana_path <- system.file("exdata/thaliana", package = "crossr")
+thaliana_path
+list.files(thaliana_path)
+list.files(thaliana_path, recursive = T)
 ```
 
-```{r}
-list.files("../inst/exdata/thaliana/SRR2033948")
-```
-
-The function `make_TPM_df` extracts the TPM from all the `.sf` files in every subfolder and organizes them in a `data.frame`.
+The function `make_TPM_df` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`.
 
 Here I use it to produce an expression matrix for the two species `thaliana` and `lyrata`.
 
 ```{r}
-thaliana <- make_TPM_df("../inst/exdata/thaliana")
+thaliana <- make_TPM_df(thaliana_path)
 str(thaliana)
 dim(thaliana)
 ```
 
 ```{r}
-lyrata <- make_TPM_df("../inst/exdata/lyrata")
+lyrata_path <- system.file("exdata/lyrata", package = "crossr")
+lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 dim(lyrata)
 ```
@@ -52,9 +52,14 @@ dim(lyrata)
 if more info on the samples are available, it might be useful to change the `colnames` of the expression sets to a more informative version. In this case we can use the feature table to do so.
 
 ```{r}
-sample_info <-  read.table("../inst/exdata/SRP058527_metadata.txt",
+sample_info_path <- system.file("exdata",
+                                "SRP058527_metadata.txt",
+                                package = "crossr")
+
+sample_info <-  read.table(sample_info_path,
                            header = TRUE,
                            sep = "\t")  
+
 reduce_info <- function(info) {
     if(info == "heat stress 0 h") "0h"
     else if(info == "heat stress 6 h 37\302\260C") "heat_6h"
@@ -96,6 +101,9 @@ The orthogroups are provided in the `OrthologousGroups.csv` file in the orthofin
 Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. The function `parse_orthogroups()` takes as input **exclusively the csv file** provided as a path.
 
 ```{r}
+ogroups_path <- system.file("exdata",
+                            "ogroups_sample.csv",
+                            package = "crossr")
 ogroups <- parse_orthogroups("../inst/exdata/ogroups_sample.csv")
 ```
 
@@ -112,7 +120,11 @@ Since orthogroups are inferred on protein sequences but short reads are mapped o
 
 Loading the feature table from refseq can be challenging, this loads the *A. thaliana* one
 ```{r}
-thaliana_id_path <- "../inst/exdata/thaliana_features_sample.txt"
+thaliana_id_path <- system.file("exdata",
+                                "thaliana_features_sample.txt",
+                                package = "crossr")
+    
+
 thaliana_ids <- read.table(file = thaliana_id_path,
                            sep = "\t", header = FALSE,
                            stringsAsFactors = FALSE,
@@ -126,7 +138,10 @@ colnames(thaliana_ids) <-  scan(file = thaliana_id_path,
 
 And this loads the *A. lyrata* one.
 ```{r}
-lyrata_id_path <- "../inst/exdata/lyrata_features_sample.txt"
+lyrata_id_path <- system.file("exdata",
+                              "lyrata_features_sample.txt",
+                              package = "crossr")
+    
 lyrata_ids <- read.table(file = lyrata_id_path,
                          sep = "\t", header = FALSE,
                          stringsAsFactors = FALSE,
@@ -140,7 +155,6 @@ colnames(lyrata_ids) <-  scan(file = lyrata_id_path,
                                 nlines = 1)[-1]  
 ```
 
-
 Then we can use `switch_ids()` to convert the IDS from *A. thaliana* first, 
 
 ```{r}
@@ -148,7 +162,7 @@ ogroups <- switch_ids(ogroups = ogroups,
                       ids_table = thaliana_ids,
                       px_id = "product_accession",
                       tx_id = "related_accession",
-                      mc.cores = 4)
+                      mc.cores = 1)
 ```
 
 and then the ones from *A. lyrata*.
@@ -158,7 +172,7 @@ ogroups <- switch_ids(ogroups = ogroups,
                       ids_table = lyrata_ids,
                       px_id = "product_accession",
                       tx_id = "related_accession",
-                      mc.cores = 4)
+                      mc.cores = 1)
 ```
 
 ## Implement a S4 element
@@ -235,7 +249,7 @@ The basic **assumption** of this method is that **genes in the same orthogroup h
 The function `collapse_orthologs()`performs this task on the `ogset` class elements, and returns the same element with the collapsed orthogroup expression set in the designated slot.
 
 ```{r}
-og_set <- collapse_orthologs(og_set, mc.cores = 4)
+og_set <- collapse_orthologs(og_set, mc.cores = 1)
 ```
 
 Not all orthogroups contain genes from both species, the orthogroups that contain genes and hence expression data from both species are stored in the slot `og_exp` for further analysis,
