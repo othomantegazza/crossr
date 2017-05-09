@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r, echo=FALSE, message=FALSE}
-devtools::load_all()
+library(crossr)
 ```
 
 Crossr is a set of function and a workflow that I use for quantitative comparison of gene expression in different species.
@@ -27,7 +27,6 @@ The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the
 
 ```{r}
 thaliana_path <- system.file("exdata/thaliana", package = "crossr")
-thaliana_path
 list.files(thaliana_path)
 list.files(thaliana_path, recursive = T)
 ```
@@ -104,7 +103,7 @@ Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups
 ogroups_path <- system.file("exdata",
                             "ogroups_sample.csv",
                             package = "crossr")
-ogroups <- parse_orthogroups("../inst/exdata/ogroups_sample.csv")
+ogroups <- parse_orthogroups(ogroups_path)
 ```
 
 The dimension of the orthogroups can be explored with the function `explore_ogroups()`
