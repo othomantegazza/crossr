@@ -15,11 +15,21 @@ library(crossr)
 
 Crossr is a set of function and a workflow that I use for quantitative comparison of gene expression in different species.
 
-The package builds up on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
+The package builds on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
 
-In this vignette I replicate the crossr workflow on this dataset: [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077), which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944)
+This vignette uses the [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077) dataset,  which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944) in order to explain the crossr workflow.
 
-In order to make this Vignette lighter, the workflow is run here on a random subset of 500 orthogroups. The example dataset are available in the exdata folder.
+This paper and dataset provide matched RNA-seq timepoints for heat shock and recovery of *Arabidopsis thaliana* and *Arabidopsis lyrata* samples, which are useful for illustrating the crossr workflow.
+
+In order to make this vignette lighter, the workflow is run on a random subset of 500 orthogroups. The sample dataset is available in the exdata folder.
+
+## Read Mapping
+
+Mapping of RNA-seq reads is not directly a part of the crossr workflow.
+
+Crossr requires two normalized expression matrix (one for each species taken into consideration) as starting point. We suggest to use expression values that are not dependent on the length of the gene such as transcript per million (TPM)
+
+For mapping of RNA-seq read we suggest Salmon and we provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R.
 
 ## Load Data
  
