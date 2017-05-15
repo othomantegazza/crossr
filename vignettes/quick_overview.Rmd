@@ -91,9 +91,11 @@ lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
 
+## Load sample metadata
+
 In the expression matrices every column represents an RNAseq sample.
 
-Usually **sample metadata** are available they might be used to change the `colnames` of the expression sets from the sample ID to names that provide more immediate information. In this case we can use this [sample sheet](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) to do so.
+Usually **sample metadata** are available they might be used to change the `colnames` of the expression sets from the sample ID to names that provide more immediate information. In this example we can use this [sample sheet](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) to do so.
 
 This code:
 
@@ -150,15 +152,17 @@ str(lyrata)
 
 # Homology groups
 
-The homology groups are called orthogroups in [orthofinder](https://github.com/davidemms/OrthoFinder) are defined as:
+The homology groups are called orthogroups in [Orthofinder](https://github.com/davidemms/OrthoFinder) and are defined as:
 
 > The set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
 
 ## Ortholog inference
 
-We use Orthofinder for ortholog inference. Discussing Orthofinder is beyond the scope of this document please, refer to its [documentation](https://github.com/davidemms/OrthoFinder/blob/master/OrthoFinder-manual.pdf)for details.
+We use Orthofinder for ortholog inference. Discussing Orthofinder is beyond the scope of this document; please, refer to its [documentation](https://github.com/davidemms/OrthoFinder/blob/master/OrthoFinder-manual.pdf) for details.
 
-We use this **bash** code in order to produce orthogroups.
+Orthofinder requires the proteomes of the species under study in order to infer orthogroups. In this example we downloaded the proteomes sequences from [NCBI](ftp://ftp.ncbi.nlm.nih.gov/genomes/) 
+
+We use this **bash** code in order to produce orthogroups:
 
 ```{bash, eval = FALSE}
 ## blast everything
@@ -170,10 +174,10 @@ python OrthoFinder-master/orthofinder.py -b path/to/results/WorkingDirectory
 
 ## Load orthogroups
 
-The orthogroups are provided in the `OrthologousGroups.csv` file in the Orthofinder output.
+The orthogroups are provided in the `OrthologousGroups.csv` file in Orthofinder's output.
 Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. 
 
-The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` that you want to parse and load in R. Please not that `parse_orthogroups()` only of parsing **exclusively the csv file**.
+The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` file that you want to parse and load in R. Please note that `parse_orthogroups()` is designed for parsing exclusively **the *.csv* file** and not the *.txt* one.
 
 ```{r}
 ogroups_path <- system.file("exdata",
@@ -182,16 +186,16 @@ ogroups_path <- system.file("exdata",
 ogroups <- parse_orthogroups(ogroups_path)
 ```
 
-The dimension of the orthogroups can be explored with the function `explore_ogroups()`.
+The number of genes for orthogroup can be explored with the function `explore_ogroups()`.
 
 ```{r, fig.width= 7, fig.height=4, fig.cap="Genes per orthogroup in the sample dataset."}
 explore_ogroups(ogroups)
 ```
 
 
-# Convert protein ID to transcript ID
+# Convert protein ID in transcript ID
 
-Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the **protein ID** in the orthogroups in **transcript ID**. 
+Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the **protein ID** in the orthogroups into **transcript ID**. 
 
 The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
 
