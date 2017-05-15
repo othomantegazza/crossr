@@ -2,7 +2,10 @@
 title: "A quick introduction to crossr"
 author: "Otho Mantegazza"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  knitr:::html_vignette:
+    toc: yes
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{overview of crossr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,17 +16,21 @@ vignette: >
 library(crossr)
 ```
 
+# Intro
+
 Crossr is a set of function and a workflow that I use for quantitative comparison of gene expression in different species.
 
 The package builds on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
 
 This vignette uses the [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077) dataset,  which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944) in order to explain the crossr workflow.
 
-This paper and dataset provide matched RNA-seq timepoints for heat shock and recovery of *Arabidopsis thaliana* and *Arabidopsis lyrata* samples, which are useful for illustrating the crossr workflow.
+This authors of this dataset provide matched RNA-seq timepoints for heat shock and recovery of *Arabidopsis thaliana* and *Arabidopsis lyrata* samples, which are useful for illustrating the crossr workflow.
 
 In order to make this vignette lighter, the workflow is run on a random subset of 500 orthogroups. The sample dataset is available in the exdata folder.
 
-## Read Mapping
+
+
+# Read Mapping
 
 Mapping of RNA-seq reads is not directly a part of the crossr workflow.
 
@@ -31,34 +38,66 @@ Crossr requires two normalized expression matrix (one for each species taken int
 
 For mapping of RNA-seq read we suggest Salmon and we provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R.
 
-## Load Data
+These are the **bash** commands that we use RNA-seq quantification with Salmon:
+
+
+```{bash, eval = FALSE}
+## make index
+./Salmon-0.7.2_linux_x86_64/bin/salmon\
+  index -t path/to/genome.fasta\
+  -i th_transcripts_index\
+  --type quasi -k 31
+
+
+## Quantify
+for f in reads/*.fastq; do 
+
+base=${f%.fastq}
+echo $base
+base=${base#reads/}
+echo $base
+
+./Salmon-0.7.2_linux_x86_64/bin/salmon quant \
+  -i path/to/index -l U \
+  -r $f -o $base\
+  -p 8
+done
+```
+
+
+# Load Output from Salmon
  
-The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the path to the folder that contains all the Salmon output subfolders for a species
+The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the **path** to the folder that contains **all the Salmon output subfolders** for a species
+
+In detail, the function `make_TPM_df()` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`, using the subfolder names as column ids.
+
+This code gets the path to the Salmon output folder and builds the expression matrix for ***A. thaliana***.
 
 ```{r}
 thaliana_path <- system.file("exdata/thaliana", package = "crossr")
-list.files(thaliana_path)
 list.files(thaliana_path, recursive = T)
 ```
-
-The function `make_TPM_df` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`.
-
-Here I use it to produce an expression matrix for the two species `thaliana` and `lyrata`.
 
 ```{r}
 thaliana <- make_TPM_df(thaliana_path)
 str(thaliana)
-dim(thaliana)
 ```
+
+And the same for ***A. lyrata***
 
 ```{r}
 lyrata_path <- system.file("exdata/lyrata", package = "crossr")
 lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
-dim(lyrata)
 ```
 
-if more info on the samples are available, it might be useful to change the `colnames` of the expression sets to a more informative version. In this case we can use the feature table to do so.
+In the expression matrices every column represents an RNAseq sample.
+
+Usually **sample metadata** are available they might be used to change the `colnames` of the expression sets from the sample ID to names that provide more immediate information. In this case we can use this [sample sheet](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) to do so.
+
+This code:
+
+- loads the feature table into R,
 
 ```{r}
 sample_info_path <- system.file("exdata",
@@ -69,6 +108,11 @@ sample_info <-  read.table(sample_info_path,
                            header = TRUE,
                            sep = "\t")  
 
+```
+
+- simplify the sample info so that they can be used as column name,
+
+```{r}
 reduce_info <- function(info) {
     if(info == "heat stress 0 h") "0h"
     else if(info == "heat stress 6 h 37\302\260C") "heat_6h"
@@ -80,7 +124,11 @@ sample_info$etime <- vapply(sample_info$exposure_time_s,
 sample_info$etime <- paste(sample_info$etime,
                            c(1, 2),
                            sep = "_")
+```
 
+- and set the sample info as column name of both datasets instead of the SRR id.
+
+```{r}
 switch_name <- function(name) {
     if(name %in% sample_info$Run_s) {
     sample_info[sample_info$Run_s == name, "etime", drop = TRUE]
@@ -100,14 +148,32 @@ str(lyrata)
 ```
 
 
+# Homology groups
+
+The homology groups are called orthogroups in [orthofinder](https://github.com/davidemms/OrthoFinder) are defined as:
+
+> The set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
+
+## Ortholog inference
+
+We use Orthofinder for ortholog inference. Discussing Orthofinder is beyond the scope of this document please, refer to its [documentation](https://github.com/davidemms/OrthoFinder/blob/master/OrthoFinder-manual.pdf)for details.
+
+We use this **bash** code in order to produce orthogroups.
+
+```{bash, eval = FALSE}
+## blast everything
+python OrthoFinder-master/orthofinder.py -f path/to/proteomes -t 3
+
+## make orthogroups
+python OrthoFinder-master/orthofinder.py -b path/to/results/WorkingDirectory
+```
+
 ## Load orthogroups
 
-The homology groups are called orthogroups and in [orthofinder](https://github.com/davidemms/OrthoFinder) are defined as:
+The orthogroups are provided in the `OrthologousGroups.csv` file in the Orthofinder output.
+Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. 
 
-> the set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
-
-The orthogroups are provided in the `OrthologousGroups.csv` file in the orthofinder output.
-Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. The function `parse_orthogroups()` takes as input **exclusively the csv file** provided as a path.
+The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` that you want to parse and load in R. Please not that `parse_orthogroups()` only of parsing **exclusively the csv file**.
 
 ```{r}
 ogroups_path <- system.file("exdata",
@@ -116,16 +182,18 @@ ogroups_path <- system.file("exdata",
 ogroups <- parse_orthogroups(ogroups_path)
 ```
 
-The dimension of the orthogroups can be explored with the function `explore_ogroups()`
+The dimension of the orthogroups can be explored with the function `explore_ogroups()`.
 
-```{r, fig.width= 7, fig.height=4, fig.cap="Figure 1"}
+```{r, fig.width= 7, fig.height=4, fig.cap="Genes per orthogroup in the sample dataset."}
 explore_ogroups(ogroups)
 ```
 
 
-## Convert protein ID to transcript ID
+# Convert protein ID to transcript ID
 
-Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the protein ID in the orthogroups in transcript ID. The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
+Since orthogroups are inferred on protein sequences but short reads are mapped on transcript sequences you might have to convert the **protein ID** in the orthogroups in **transcript ID**. 
+
+The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
 
 Loading the feature table from refseq can be challenging, this loads the *A. thaliana* one
 ```{r}
@@ -184,7 +252,7 @@ ogroups <- switch_ids(ogroups = ogroups,
                       mc.cores = 1)
 ```
 
-## Implement a S4 element
+# Implement a S4 element
 
 Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together all the various expression set, annotoations and statistics that we have loaded and/or that we are going to produce.
 
@@ -214,7 +282,7 @@ After adding new elements to an `ogset` object, one can check that the object is
 check_ogset(og_set)
 ```
 
-### Save sample information (colData) in the ogset element
+## Save sample information (colData) in the ogset element
 
 We specify the sample information in the `spec1_colData` and `spec2_colData` slots of the `ogset` element.
 
@@ -249,7 +317,7 @@ check_ogset(og_set)
 ```
 
 
-## Collapse orthologues
+# Collapse orthologues
 
 As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A "quick and dirty"" solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
 
@@ -280,7 +348,7 @@ check_ogset(og_set)
 ```
 
 
-## Select genes that behave differently between species
+# Select genes that behave differently between species
 
 Now that we moved to ortholog-wise expression, we are dealing with a one to one relationship among species.
 
@@ -338,7 +406,7 @@ og_set <- add_fit(ogset = og_set, log_scale = TRUE)
 
 The info on the `log_scale` parameter are stored in the `metadata` slot
 
-## Explore results
+# Explore results
 
 We have an F-value associated to any of the three terms in the design formula that we have supplied
 
@@ -355,7 +423,7 @@ tt
 
 `get_top_tags()` returns a named numeric vector containing both the id of the top orthogroups and their associated statistics.
 
-### Explore orthogroup expression
+## Explore orthogroup expression
 
 The function `plot_all_stages` can be used to plot a stripchart of the expression level of one orthogroups in all the samples.
 It requires as input:
@@ -387,7 +455,7 @@ sapply(tt,
        ylab = "Log Scaled TPM")
 ```
 
-### Plot all the genes in one orthogroup
+## Plot all the genes in one orthogroup
 
 The workflw of `crossr` relies on the assumption that:
 
@@ -407,7 +475,7 @@ plot_og_genes(ogroup = top_group,
 
 As we can see the orthogroup `r top_group` contains only 2 genes, but we can expect orthogroups of different size and different ratios between genes from ine species and from the other.
 
-### Example, orthogroup OG0002779
+# Example, orthogroup OG0002779
 
 ```{r}
 example_group <- "OG0002779"
@@ -439,7 +507,7 @@ plot_og_genes(ogroup = example_group,
 ```
 
 
-## Clusters
+# Clusters
 
 Ranking orthogroups by F-value of the interaction term and arbitrary cutoffs can be useful to detect genes that behave differently in the two species, but in this way we select genes that behave differently in any way.
 
@@ -447,7 +515,7 @@ Clusters and heatmap can be useful in order to group together orthogroups that b
 
 
 
-## Session info
+# Session info
 
 Here is the output of `devtools::session_info()` on the system on which this document was compiled:
 
