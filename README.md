@@ -1,8 +1,10 @@
-## crossr
+## Crossr
 
 ### Overview
 
-*crossr* is set of functions and a workflow that can be useful for quantitative comparison of transcriptomic data from different species.
+*Crossr* is set of functions and a workflow that can be useful for quantitative comparison of transcriptomic data from different species.
+
+*Crossr* is under development and comes with **no warranty**.
 
 ### Install
 

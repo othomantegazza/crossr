@@ -158,11 +158,15 @@ The homology groups are called orthogroups in [Orthofinder](https://github.com/d
 
 ## Ortholog inference
 
-We use Orthofinder for ortholog inference. Discussing Orthofinder is beyond the scope of this document; please, refer to its [documentation](https://github.com/davidemms/OrthoFinder/blob/master/OrthoFinder-manual.pdf) for details.
+We use **Orthofinder** for ortholog inference. Discussing Orthofinder is beyond the scope of this document; please, refer to its [documentation](https://github.com/davidemms/OrthoFinder/blob/master/OrthoFinder-manual.pdf) for details.
 
-Orthofinder requires the proteomes of the species under study in order to infer orthogroups. In this example we downloaded the proteomes sequences from [NCBI](ftp://ftp.ncbi.nlm.nih.gov/genomes/) 
+Orthofinder requires the proteomes of the species under study in order to infer orthogroups. In this example we downloaded the proteomes sequences from [NCBI ftp site](ftp://ftp.ncbi.nlm.nih.gov/) using the following version:
 
-We use this **bash** code in order to produce orthogroups:
+- **GCF_000001735.3_TAIR10** for *A. thaliana* - [Download (11.3 Mb)](ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_thaliana/latest_assembly_versions/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_protein.faa.gz),
+- **GCF_000004255.1_v.1.0** for *A. lyrata* - [Download (7.0 Mb)](ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_lyrata/all_assembly_versions/GCF_000004255.1_v.1.0/GCF_000004255.1_v.1.0_protein.faa.gz)
+
+
+We use this **bash** lines in order to produce orthogroups:
 
 ```{bash, eval = FALSE}
 ## blast everything
@@ -177,7 +181,7 @@ python OrthoFinder-master/orthofinder.py -b path/to/results/WorkingDirectory
 The orthogroups are provided in the `OrthologousGroups.csv` file in Orthofinder's output.
 Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. 
 
-The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` file that you want to parse and load in R. Please note that `parse_orthogroups()` is designed for parsing exclusively **the *.csv* file** and not the *.txt* one.
+The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` file that you want to parse and load in R. Please note that `parse_orthogroups()` is designed for parsing **exclusively the *.csv* file** and not the *.txt* one.
 
 ```{r}
 ogroups_path <- system.file("exdata",
