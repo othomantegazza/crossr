@@ -165,6 +165,7 @@ Orthofinder requires the proteomes of the species under study in order to infer 
 - **GCF_000001735.3_TAIR10** for *A. thaliana* - [Download (11.3 Mb)](ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_thaliana/latest_assembly_versions/GCF_000001735.3_TAIR10/GCF_000001735.3_TAIR10_protein.faa.gz),
 - **GCF_000004255.1_v.1.0** for *A. lyrata* - [Download (7.0 Mb)](ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/plant/Arabidopsis_lyrata/all_assembly_versions/GCF_000004255.1_v.1.0/GCF_000004255.1_v.1.0_protein.faa.gz)
 
+The samples are in the `exdata` folder.
 
 We use this **bash** lines in order to produce orthogroups:
 
@@ -203,7 +204,11 @@ Since orthogroups are inferred on protein sequences but short reads are mapped o
 
 The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
 
-Loading the feature table from refseq can be challenging, this loads the *A. thaliana* one
+In this case the **feature tables** containing the mapping were downladed from **NCBI** from the same folder as the proteomes. Again, the samples are in the `exdata` folder.
+
+Loading the feature table from refseq can be challenging, and the issues encountered are often table specific. I ou experiences one of the main sources of issues can be special characters in gene names and gene annotation within the table, such as hashes ( \# ) and quotes ( ' ). The quotes can be find pretty often because they are used in the 5' and 3' notation.
+
+This code loads the *A. thaliana* feature table.
 ```{r}
 thaliana_id_path <- system.file("exdata",
                                 "thaliana_features_sample.txt",
@@ -260,13 +265,17 @@ ogroups <- switch_ids(ogroups = ogroups,
                       mc.cores = 1)
 ```
 
+Note that the orthogroups contain IDS from **both species**, therefore `switch_ids()` must be called twice.
+
 # Implement a S4 element
 
-Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together all the various expression set, annotoations and statistics that we have loaded and/or that we are going to produce.
+Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together the expression sets, annotoations and statistics that we have loaded and/or that we are going to produce.
 
-If reader want an introduction to S4 classes in R, I suggest this chapter from Hadley Wickham's advanced R book: http://adv-r.had.co.nz/S4.html
+We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 classes in R
 
-The *crossr* package defines the S4 class `ogset` which can be created with thee `make_ogset` constructor function.
+## The ogset class
+
+The *crossr* package defines the S4 class `ogset` which can be created with the `make_ogset` constructor function.
 
 ```{r}
 og_set <-  make_ogset(og = ogroups,
@@ -274,11 +283,11 @@ og_set <-  make_ogset(og = ogroups,
                        spec2_exp = lyrata)
 ```
 
-The `ogset` class is made to store orthogroup expression, and it has slots for orthogroup expression, list of genes in orthogroups, single species expression data, design and annotation data. But not all these elements are not necessary when initialising the object with `make_ogset()`. The `ogset` class is modeled on Bioconductor Summarized experiment class.
+The `ogset` class is made to store orthogroup expression data and metadata; it has slots for orthogroup expression data, list of genes in orthogroups, single species expression data, design and annotation data. None of these elements is necessary when initialising the object with `make_ogset()` and also an empty set can be initialized. The `ogset` class is modeled on Bioconductor Summarized experiment class.
 
-When the `ogset` element is initialized, the function `check_ogset()` is called in order to check if the elements of the object match with each others. In the specific, `check_ogset()` checks that:
+When the `ogset` element is initialized, the function `check_ogset()` is called in order to check if the elements of the object match with each others. In details, `check_ogset()` checks that:
 
-- The names of the orthogroups match the rownames of the orthogroup expression set `og_eset` (if any is given),
+- The names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
 - The row names of `colData` match the column names of the orthogroup expression set,
 - The row names of `rowData`match the row names of the orthogroup expression set.
 - The variable in `design` are colnames of `colData`.
