@@ -271,7 +271,7 @@ Note that the orthogroups contain IDS from **both species**, therefore `switch_i
 
 Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together the expression sets, annotoations and statistics that we have loaded and/or that we are going to produce.
 
-We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 classes in R
+We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 classes in R.
 
 ## The ogset class
 
@@ -287,11 +287,14 @@ The `ogset` class is made to store orthogroup expression data and metadata; it h
 
 When the `ogset` element is initialized, the function `check_ogset()` is called in order to check if the elements of the object match with each others. In details, `check_ogset()` checks that:
 
-- The names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
-- The row names of `colData` match the column names of the orthogroup expression set,
-- The row names of `rowData`match the row names of the orthogroup expression set.
-- The variable in `design` are colnames of `colData`.
-- The sample information (colData) of the two species expression dataframes contain the same experimental variables.
+- the names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
+- the row names of `colData` (if any) match the column names of the orthogroup expression set `og_eset`,
+- the row names of `rowData` (if any) match the row names of the orthogroup expression set `og_eset`,
+- the variable in `design` (if any) are colnames of `colData`,
+- the rownames of `spec1_colData` match the colnames `spec1_exp` (if any),
+- the rownames of `spec2_colData` match the colnames `spec2_exp` (if any),
+- `exp_cond` is a character string,
+- `exp_cond` is contained in columns of `spec1_colData` and `spec2_colData` and that those columns match.
 
 After adding new elements to an `ogset` object, one can check that the object is still valid by calling `check_ogset()` which returns TRUE if the object is valid.
 

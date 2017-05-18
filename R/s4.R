@@ -7,6 +7,18 @@ NULL
 
 #' Check Validity of an \code{ogset} class element
 #'
+#' The function \code{check_ogset} checks that in the provided object:
+#' - the names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
+#' - the row names of `colData` (if any) match the column names of the orthogroup expression set `og_eset`,
+#' - the row names of `rowData` (if any) match the row names of the orthogroup expression set `og_eset`,
+#' - the variable in `design` (if any) are colnames of `colData`,
+#' - the rownames of `spec1_colData` match the colnames `spec1_exp` (if any),
+#' - the rownames of `spec2_colData` match the colnames `spec2_exp` (if any),
+#' - `exp_cond` is a character string
+#' - `exp_cond` is contained in columns of `spec1_colData` and `spec2_colData` and that those columns match.
+#' @md
+#'
+#'
 #' @param object an \code{ogset} class element
 #'
 #' @export
@@ -103,6 +115,24 @@ check_ogset <- function(object) {
 
 
 #' S4 Class, Container for Ortholog Expression Data
+#'
+#' None of the arguments is required to initialize a ogset class element
+#'
+#' @param og A \code{list} of Orthogroups
+#' @param og_exp A orthogroup-wise expression \code{data.frame}
+#' @param rowData A \code{data.frame} containing the functional annotation for the orthogroups
+#' @param colData A \code{data.frame} containing the sample info for `og_exp`
+#' @param desing A \code{formula} describing the experimental design
+#' @param metadata A \code{list} of metadata
+#' @param stats A \code{data.frame} with output statistics for `og_exp`
+#' @param spec1_exp A \code{data.frame} with expression data for species 1
+#' @param spec2_exp A \code{data.frame} with expression data for species 2
+#' @param spec1_colData A \code{data.frame} with sample info for `spec1_exp`
+#' @param spec2_colData A \code{data.frame} with sample info for `spec2_exp`
+#' @param exp_cond A \code{character} string indicating which variable of `design`
+#'  represents the experimental condition under which the two species are compared
+#' @param og_nomatch orthogroup represented only in one species, filled by \code{collapse_orthologs}
+#'
 #'
 #' @export make_ogset
 

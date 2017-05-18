@@ -5,6 +5,34 @@
 \alias{ogset-class}
 \alias{make_ogset}
 \title{S4 Class, Container for Ortholog Expression Data}
+\arguments{
+\item{og}{A \code{list} of Orthogroups}
+
+\item{og_exp}{A orthogroup-wise expression \code{data.frame}}
+
+\item{rowData}{A \code{data.frame} containing the functional annotation for the orthogroups}
+
+\item{colData}{A \code{data.frame} containing the sample info for `og_exp`}
+
+\item{desing}{A \code{formula} describing the experimental design}
+
+\item{metadata}{A \code{list} of metadata}
+
+\item{stats}{A \code{data.frame} with output statistics for `og_exp`}
+
+\item{spec1_exp}{A \code{data.frame} with expression data for species 1}
+
+\item{spec2_exp}{A \code{data.frame} with expression data for species 2}
+
+\item{spec1_colData}{A \code{data.frame} with sample info for `spec1_exp`}
+
+\item{spec2_colData}{A \code{data.frame} with sample info for `spec2_exp`}
+
+\item{exp_cond}{A \code{character} string indicating which variable of `design`
+represents the experimental condition under which the two species are compared}
+
+\item{og_nomatch}{orthogroup represented only in one species, filled by \code{collapse_orthologs}}
+}
 \description{
-S4 Class, Container for Ortholog Expression Data
+None of the arguments is required to initialize a ogset class element
 }

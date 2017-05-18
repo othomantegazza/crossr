@@ -10,5 +10,15 @@ check_ogset(object)
 \item{object}{an \code{ogset} class element}
 }
 \description{
-Check Validity of an \code{ogset} class element
+The function \code{check_ogset} checks that in the provided object:
+\itemize{
+\item the names of the orthogroups (\code{og}) match the rownames of the orthogroup expression set \code{og_eset} (if any is given),
+\item the row names of \code{colData} (if any) match the column names of the orthogroup expression set \code{og_eset},
+\item the row names of \code{rowData} (if any) match the row names of the orthogroup expression set \code{og_eset},
+\item the variable in \code{design} (if any) are colnames of \code{colData},
+\item the rownames of \code{spec1_colData} match the colnames \code{spec1_exp} (if any),
+\item the rownames of \code{spec2_colData} match the colnames \code{spec2_exp} (if any),
+\item \code{exp_cond} is a character string
+\item \code{exp_cond} is contained in columns of \code{spec1_colData} and \code{spec2_colData} and that those columns match.
+}
 }
