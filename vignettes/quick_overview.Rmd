@@ -267,11 +267,11 @@ ogroups <- switch_ids(ogroups = ogroups,
 
 Note that the orthogroups contain IDS from **both species**, therefore `switch_ids()` must be called twice.
 
-# Implement a S4 element
+# Implement a S4 object
 
 Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together the expression sets, annotoations and statistics that we have loaded and/or that we are going to produce.
 
-We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 classes in R.
+We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 objects in R.
 
 ## The ogset class
 
@@ -283,9 +283,11 @@ og_set <-  make_ogset(og = ogroups,
                        spec2_exp = lyrata)
 ```
 
-The `ogset` class is made to store orthogroup expression data and metadata; it has slots for orthogroup expression data, list of genes in orthogroups, single species expression data, design and annotation data. None of these elements is necessary when initialising the object with `make_ogset()` and also an empty set can be initialized. The `ogset` class is modeled on Bioconductor Summarized experiment class.
+The `ogset` class is designed to store orthogroup expression data and metadata; it has slots for orthogroup expression data, list of genes in orthogroups, single species expression data, design and annotation data. None of these elements is necessary when initialising the object with `make_ogset()` and also an empty set can be initialized.
 
-When the `ogset` element is initialized, the function `check_ogset()` is called in order to check if the elements of the object match with each others. In details, `check_ogset()` checks that:
+The `ogset` class is modeled on Bioconductor Summarized experiment class.
+
+When the `ogset` element is initialized, `make_ogset()` calls the function `check_ogset()` in order to check that the elements supplied match with each others. In details, `check_ogset()` checks that:
 
 - the names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
 - the row names of `colData` (if any) match the column names of the orthogroup expression set `og_eset`,
@@ -296,17 +298,19 @@ When the `ogset` element is initialized, the function `check_ogset()` is called 
 - `exp_cond` is a character string,
 - `exp_cond` is contained in columns of `spec1_colData` and `spec2_colData` and that those columns match.
 
-After adding new elements to an `ogset` object, one can check that the object is still valid by calling `check_ogset()` which returns TRUE if the object is valid.
+`check_ogset()` can be called again at any time later. For example, after adding new elements to an `ogset` object, one can use it to check that the object is still valid. In case `check_ogset()` will return `TRUE`.
 
 ```{r}
 check_ogset(og_set)
 ```
 
-## Save sample information (colData) in the ogset element
 
-We specify the sample information in the `spec1_colData` and `spec2_colData` slots of the `ogset` element.
+ 
+## Store sample information (colData) in the ogset class element
 
-In this case we have already expressed the sample information in the colnames of the two datasets, and we can use that to specify very basic colData, but more complex and detailed sample information can be provided.
+The **sample metadata** for the two species can be saved in the `spec1_colData` and `spec2_colData` slots of the `ogset` element.
+
+In this case we have already expressed simplified information on the samples in the colnames of the two datasets. We can use this to specify very basic colData. Anyway, any kind of detailed sample metadata can be provided as `data.frame`.
 
 ```{r}
 colnames(og_set@spec1_exp)
@@ -324,13 +328,19 @@ og_set@spec1_colData <- coldata_spec1
 og_set@spec2_colData <- coldata_spec2
 ``` 
 
-then we have to provide information on which column of the `coldata_spec` datasets contains the main information for the experimental condition that is used to compare the two species. The levels of this column must be the same for both datasets; which means that we are testing for the response to the same experimental condition in the two species.
+## Experimental factor
+
+We have to provide information on which column of the colData datasets contains the main information on the **experimental conditions** under which we are **comparing** the two species (it could be different growth stages, treatments etc.).
+
+The **name of the column** that encodes for the experimental factor in colData can be stored in the `exp_cond` slot.
+
+This column must contain the same categorical variables in both the `spec1_colData` and the `spec2_colData` datasets; indeed, we are testing for the response to the same experimental condition in the two species.
 
 ```{r}
 og_set@exp_cond <- "treat"
 ```
 
-and we can check that the ogset element is still valid
+Afterwards, we can check that the ogset element is still valid.
 
 ```{r}
 check_ogset(og_set)
@@ -339,11 +349,13 @@ check_ogset(og_set)
 
 # Collapse orthologues
 
-As seen in Figure 1 most of the orthogroup contain only two genes, generally one from lyrata and one thaliana. Many other orthogroups though contain different (any) number of genes from one species and from the other. A "quick and dirty"" solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
+As seen in *Figure 1* most of the orthogroup contain only two genes, generally one from *A. lyrata* and one from *A. thaliana*.
+
+Many other orthogroups though contain different (any) number of genes from one species and from the other. A "quick and dirty"" solution to restore a one to one relationship among features is to collapse the orthologues by adding up the expression values of genes within the same orthogroup.
 
 The basic **assumption** of this method is that **genes in the same orthogroup have the same function**.
 
-The function `collapse_orthologs()`performs this task on the `ogset` class elements, and returns the same element with the collapsed orthogroup expression set in the designated slot.
+The function `collapse_orthologs()` performs this task on an `ogset` class element, and returns the same element with the collapsed orthogroup expression set in the designated slot.
 
 ```{r}
 og_set <- collapse_orthologs(og_set, mc.cores = 1)
@@ -361,18 +373,18 @@ the ones that does not are stored in the slot `og_nomatch`
 str(og_set@og_nomatch)
 ```
 
-After we have modified the ogset element (anytime), we can check again for its consistency with the function `check_ogset()` (optional).
+After we have collapsed orthologues we can **check for consistency** of the `ogset` object with the function `check_ogset()`.
 
 ```{r}
 check_ogset(og_set)
 ```
 
 
-# Select genes that behave differently between species
+# Select groups that behave differently between species
 
-Now that we moved to ortholog-wise expression, we are dealing with a one to one relationship among species.
+After moving to orthogroup-wise expression, we can search for orthogroups that behave differently in the two species.
 
-In order to stay on the safe side I do not perform direct comparison of expression level between the two species, but use the F-value on the interaction term to screen for orthogroups that display a relative different expression pattern between the two species.
+Since genes from the two species within the same orthogroup have different sequences, we **do not perform direct comparison** of orthogroup expression level between the two species, instead, we use a linear model in order to detect **relative differences** of expression of the orthogroups between the two species across the different experimental condition specified in the experimental design.
 
 Also, since the data have gone through many transformation it is hard to make assumption on their distribution, therefore I do not extract a p-value, rather I use the F-value on the interaction term as a ranking feature, in order to select the genes that seem to behave differently among the species.
 
