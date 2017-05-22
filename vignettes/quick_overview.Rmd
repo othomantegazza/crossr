@@ -464,30 +464,37 @@ og_set@metadata
 
 # Explore results
 
-We have an F-value associated to any of the three terms in the design formula that we have supplied
+`add_fit()` saves an the F-statistic for all the terms in the design formula for every gene
 
 ```{r}
 head(og_set@stats)
 ```
 
-The F statistic for adding the interaction term to the linear model (in this case `spc:treat`) can be used as a feature that ranks orthogroups in base of how likely they are to behave differently between different species. The ID of the orthogroups with the highest F-value can be extracted with the function `get_top_tags()`.
+As mentioned above, the F-statistic associated to the interaction term `spc:treat` can be used as a ranking feature. The orthogroups with the highest F-value are the one that display a more divergent behaviour in the two species.
+
+The function `get_top_tags()` extracts the ID of the orthogroups with the highest F-value.
 
 ```{r}
-tt <- get_top_tags(og_set, "spc:treat", 10)
+tt <- get_top_tags(ogset = og_set,
+                   rank_stat = "spc:treat",
+                   n =  10)
 tt
 ```
 
 `get_top_tags()` returns a named numeric vector containing both the id of the top orthogroups and their associated statistics.
 
-## Explore orthogroup expression
+## Plot orthogroup expression
 
-The function `plot_all_stages` can be used to plot a stripchart of the expression level of one orthogroups in all the samples.
+The function `plot_all_stages` plots a stripchart of the expression of the supplied orthogroup.
+
 It requires as input:
 
-- the name of the orthogroup,
-- the the ogset element,
-- the species encoding in the design formula (in this case `spc`)
-- the condition encoding in the design formula (in this case `treat`)
+- the **name** of the orthogroup,
+- the **ogset element** that contains the details for that orthogroup,
+- the **species encoding** in the design formula (in this case `spc`)
+- the **condition encoding** in the design formula (in this case `treat`)
+
+The code below selects the highest differentally expressed group and plots it.
 
 ```{r, fig.height=4, fig.width=5}
 top_group <- names(get_top_tags(og_set, "spc:treat", 1))
@@ -498,9 +505,9 @@ plot_all_stages(orthogroup = top_group,
                 ylab = "Log Scaled TPM")
 ```
 
-This can be combined with faceting in order to plot the expression of multiple orthogroups. For example here I plot the top 12 differentially expressed orthogroups in a 4X3 faceting
+This can be combined with faceting in order to plot the expression of multiple orthogroups. These lines of code select and plot the top 12 differentially expressed orthogroups in a 4X3 faceting
 
-```{r, fig.height=9, fig.width=7}
+```{r, fig.height=9, fig.width=7, results='hide'}
 tt <- names(get_top_tags(og_set, "spc:treat", 12))
 par(mfrow = c(4, 3))
 sapply(tt,
@@ -511,25 +518,24 @@ sapply(tt,
        ylab = "Log Scaled TPM")
 ```
 
-## Plot all the genes in one orthogroup
+## Plot all the genes composing a specific orthogroup
 
-The workflw of `crossr` relies on the assumption that:
+The workflow of `crossr` relies on the assumption that **all the genes composing one orthogroup have the same function**. 
 
-> all the genes in one orthogroup have the same function. 
+If this **useful working assumption** was always verified, the expression values of those genes could be added without generating artefacts. Unfortunately this is not the case.
 
-Therefore their exoression values can be added without this resulting in a misenterpretation of the activity of certain groups.
+Therefore we suggest that, before drawing any conclusion, the user should explore by plotting **also the expression pattern of the single genes** contained in the orthogroups that are differentially expressed.
 
-This is a useful working assumption but it is not always verified, therefore I suggest, also, before drawing any conclusion, to explore also the expression pattern of the single genes contained in 1 orthogroup.
+This can be achieved with the function `plot_og_genes`, that prints the number and the ID of the genes composing the user supplied orthogroup and plot their expression.
 
-This can be achieved with the function `plot_og_genes`.
-
-```{r}
+```{r, fig.width=9}
+par(mfrow = c(1, 2))
 plot_og_genes(ogroup = top_group,
               ogset = og_set,
               ylab = "TPM")
 ```
 
-As we can see the orthogroup `r top_group` contains only 2 genes, but we can expect orthogroups of different size and different ratios between genes from ine species and from the other.
+The orthogroup `r top_group` contains only 2 genes, but we can expect orthogroups of different size and different ratios of genes from one species and from the other.
 
 # Example, orthogroup OG0002779
 
