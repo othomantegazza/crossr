@@ -384,15 +384,24 @@ check_ogset(og_set)
 
 After moving to orthogroup-wise expression, we can search for orthogroups that behave differently in the two species.
 
-Since genes from the two species within the same orthogroup have different sequences, we **do not perform direct comparison** of orthogroup expression level between the two species, instead, we use a linear model in order to detect **relative differences** of expression of the orthogroups between the two species across the different experimental condition specified in the experimental design.
+## Experimental design with interaction factor
 
-Also, since the data have gone through many transformation it is hard to make assumption on their distribution, therefore I do not extract a p-value, rather I use the F-value on the interaction term as a ranking feature, in order to select the genes that seem to behave differently among the species.
+Since genes from the two species within the same orthogroup have different sequences, we **do not perform direct comparison** of orthogroup expression level between the two species. Instead, we use a linear model in order to detect **relative differences** of expression of each orthogroup between the two species across the different experimental condition.
+
+We achieve this by setting a design formula with one term for the species (`spc` in this case) one term for the treatment / experimental factor (`treat` in this case) and then an interaction factor (`spc:treat` in this case). So in this case the design formula will be `~ spc + treat + spc:treat`. Than we use the F-value of the interaction term as ranking feature.
+
+Also, since the data have gone through many transformation it is hard to make assumption on their distribution, therefore we do not extract a p-value from the linear model. We use the F-value on the interaction term as a ranking feature, in order to select the genes that seem to behave differently among the species.
+
+## Orthogroup ranking in practice
 
 The function that fits the linear model and performs ANOVA is called `add_fit()`
 
-----------
+In order to call it:
 
-First we have to add the column data (the information on the sample) to the ogset element and to provide it with details on the experimental design.
+1. first we have load information on the column of the orthogroup expression set `og_exp` into the `ogset` element,
+2. then we have to specify an experimental design.
+
+### specify colData for orthogroup-wise expression
 
 The column data were previoulsy encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
 
@@ -412,31 +421,46 @@ coldata <- data.frame(spc = sapply(colnames(og_set@og_exp),
 coldata
 ```
 
-And provide those information to the ogset element
+And provide those information to the `ogset` element in the `colData` slot.
 
 ```{r}
 og_set@colData <- coldata
 check_ogset(og_set)
 ```
 
-The experimental design must also be provided, indicating which variable to compare:
+### specify design
+
+The experimental design can be specified in the `design` slot:
 
 ```{r}
 og_set@design <- ~ 0 + spc + treat + spc:treat
 check_ogset(og_set)
 ```
 
-----------
+### Estimate F-values and rank
 
-Now we can calculate the F-values. 
+Now we can calculate the F-values with `add_fit()`. 
 
-I would suggest to do so on log scaled value, since this should be more appropriate for studying relative changes. This could be done by passing the argument `log_scale = TRUE` to the `add_fit()` function (actually 1 is added to the data before natural log trasformation, so the transformation performed is `log(data + 1)`.
+We would suggest calculate the F-value on **log scaled value**, this is more approprite for studying relative changes. This could be done with the argument `log_scale = TRUE` to the `add_fit()`. In this way, the `add_fit()` function:
+ 
+1. add 1 to the every observation in the orthogroup expression dataset,
+2. log transforms the data,
+3 estimates the F-values,
+4. writes the F-values in the `stats` slot.
+
+So, in this way the F-value are estimated on `log(data + 1)`.
 
 ```{r}
 og_set <- add_fit(ogset = og_set, log_scale = TRUE)
+str(og_set@stats)
 ```
 
-The info on the `log_scale` parameter are stored in the `metadata` slot
+The info on the `log_scale` parameter are stored in the `metadata` slot.
+
+```{r}
+og_set@metadata
+```
+
 
 # Explore results
 
