@@ -4,7 +4,8 @@
 \alias{plot_all_stages}
 \title{Plot the Expression of One Orthogroup in Both Species}
 \usage{
-plot_all_stages(orthogroup, ogset, species, condition, main = "", ...)
+plot_all_stages(orthogroup, ogset, species, condition, main = "",
+  use_annos = FALSE, annos_col = NULL, ...)
 }
 \arguments{
 \item{orthogroup}{a \code{character} string}
@@ -19,6 +20,13 @@ conditions of the samples in the columns of the dset}
 
 \item{main}{the title of the plot}
 
+\item{use_annos}{\code{logical}; if TRUE, functional annotation from og_annos will be displayed in
+the plot subtitle. Defaults to FALSE}
+
+\item{annos_col}{a \code{character} string with the name of the column of og_annos that contains
+the functional annotation that should be displayed. Defaults to NULL. It must be provided if \code{use_annos}
+is set to TRUE.}
+
 \item{...}{arguments to be passed to \code{stripchart}}
 }
 \description{
@@ -26,7 +34,7 @@ conditions of the samples in the columns of the dset}
 and a line plot of the expression of an orthogroup across all samples
 }
 \details{
-This function takes an orthogroup ID and the expression matrix.
+This function takes an orthogroup ID and an ogset class element as arguments.
 It plots a stripchart of the expression of all the stages; The title of the
 stripchart contains details on: how many genes are in the orthogroup, the cluster
 that contain the ogroup (if any), the F-value for the interaction term.

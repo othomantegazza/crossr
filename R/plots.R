@@ -3,7 +3,7 @@
 #' \code{plot_all_stages} is a wrapper for \code{stripchart} and plots a stripchart
 #' and a line plot of the expression of an orthogroup across all samples
 #'
-#' This function takes an orthogroup ID and the expression matrix.
+#' This function takes an orthogroup ID and an ogset class element as arguments.
 #' It plots a stripchart of the expression of all the stages; The title of the
 #' stripchart contains details on: how many genes are in the orthogroup, the cluster
 #' that contain the ogroup (if any), the F-value for the interaction term.
@@ -15,6 +15,11 @@
 #' @param condition a string used to encode the experimental
 #' conditions of the samples in the columns of the dset
 #' @param main the title of the plot
+#' @param use_annos \code{logical}; if TRUE, functional annotation from og_annos will be displayed in
+#'  the plot subtitle. Defaults to FALSE
+#' @param annos_col a \code{character} string with the name of the column of og_annos that contains
+#'  the functional annotation that should be displayed. Defaults to NULL. It must be provided if \code{use_annos}
+#'  is set to TRUE.
 #' @param ... arguments to be passed to \code{stripchart}
 #'
 #' @export
@@ -25,13 +30,16 @@ plot_all_stages <- function(orthogroup,
                             species,
                             condition,
                             main = "",
+                            use_annos = FALSE,
+                            annos_col = NULL,
                             ...)
 {
     old_mar <- graphics::par()$mar
     on.exit(graphics::par(mar = old_mar))
+    if(use_annos) stopifnot(annos_col %in% colnames(ogset@og_annos))
     # stopifnot(ncol(dset) == length(species) && ncol(dset) == length(condition))
 
-    # par(mar = c(5, 4, 8, 2))
+    # if(use_annos) par(mar = c(3, 4, 7, 2))
 
     spc_levels <- unique(ogset@colData[[species]])
     spec_fac <- ogset@colData[[species]]
@@ -45,11 +53,21 @@ plot_all_stages <- function(orthogroup,
                       as.factor(cond_fac[spec_fac == spc_levels[2]]))
     b_points <- lapply(b_points, unlist)
 
+    f_annos <- ifelse(use_annos,
+                      yes = gsub(pattern = "--",
+                                 replacement = "\n",
+                                 x = ogset@og_annos[orthogroup, annos_col, drop = TRUE]),
+                      no = "")
+
+    main <- ifelse(main == "", orthogroup, main)
+    main <- ifelse(use_annos, paste(main, f_annos, sep = "\n"), main)
+
+
     graphics::stripchart(a_points,
                          frame = FALSE, vertical = TRUE,
                          ylim = range(unlist(c(a_points, b_points))),
                          pch = 16, method = "jitter",
-                         main = ifelse(main == "", orthogroup, main),
+                         main = main,
                          ...)
     graphics::stripchart(b_points,
                          frame = FALSE, vertical = TRUE, add = TRUE,

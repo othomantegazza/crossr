@@ -382,11 +382,11 @@ check_ogset(og_set)
 
 # Functional annotation for orthogroups
 
-In order to get rudimentary functional annotation for the orthogroups we simply associate to an orthogroup all the functional annotations of the genes composing it.
+In order to get rudimentary functional annotations for the orthogroups we simply associate to an orthogroup all the functional annotations of the genes composing it.
 
 In this example we use exclusively functional annotations of *A. thaliana*, since they are supposedly better than the annotations of *a. lyrata*.
 
-## Functional annotation in practice
+## Functional annotations in practice
 
 The feature names in the **feature table** of *A. thaliana* contain enough functional information for our purpose. This dataset was loaded in R under section 3 of this document in the object `thaliana_ids`.
 
@@ -412,12 +412,13 @@ get_annos <- function(ogroup)
     return(annos)
 }
 
-og_set@og_annos <- data.frame(vapply(og_set@og, get_annos, character(1)))
+og_set@og_annos <- data.frame(func_annos = vapply(og_set@og, get_annos, character(1)),
+                              stringsAsFactors = FALSE)
 
 head(og_set@og_annos)
 ```
 
-Afterward, as always, we can check for consistency of the og_set element.
+Afterwards, as always, we can check for consistency of the og_set element.
 
 ```{r}
 check_ogset(og_set)
@@ -445,7 +446,7 @@ In order to call it:
 1. first we have load information on the column of the orthogroup expression set `og_exp` into the `ogset` element,
 2. then we have to specify an experimental design.
 
-### specify colData for orthogroup-wise expression
+### Specify colData for orthogroup-wise expression
 
 The column data were previoulsy encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
 
@@ -472,7 +473,7 @@ og_set@colData <- coldata
 check_ogset(og_set)
 ```
 
-### specify design
+### Specify design
 
 The experimental design can be specified in the `design` slot:
 
@@ -527,6 +528,13 @@ tt
 
 `get_top_tags()` returns a named numeric vector containing both the id of the top orthogroups and their associated statistics.
 
+We can extract the functional informations for the top tags with:
+
+```{r}
+og_set@og_annos[names(tt), ]
+```
+
+
 ## Plot orthogroup expression
 
 The function `plot_all_stages` plots a stripchart of the expression of the supplied orthogroup.
@@ -562,6 +570,23 @@ sapply(tt,
        ylab = "Log Scaled TPM")
 ```
 
+Functional annotation can be displayed in the plot subtitle with the arguments `use_annos` and `annos_col`.
+If you plan to display functional annotation, we suggest you to increase the upper margin of the plot with the function `par()`.
+
+```{r, fig.height=4.5, fig.width=5}
+par(mar = c(3, 4, 7, 2))
+
+top_group <- names(get_top_tags(og_set, "spc:treat", 1))
+plot_all_stages(orthogroup = top_group,
+                ogset = og_set,
+                species = "spc",
+                condition = "treat",
+                use_annos = TRUE,
+                annos_col = "func_annos",
+                ylab = "Log Scaled TPM")
+
+```
+ 
 ## Plot all the genes composing a specific orthogroup
 
 The workflow of `crossr` relies on the assumption that **all the genes composing one orthogroup have the same function**. 
