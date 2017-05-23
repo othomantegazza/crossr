@@ -9,6 +9,7 @@ NULL
 #'
 #' The function \code{check_ogset} checks that in the provided object:
 #' - the names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
+#' - the row names of og_annos are contained in the names of the orthogroup list
 #' - the row names of `colData` (if any) match the column names of the orthogroup expression set `og_eset`,
 #' - the row names of `rowData` (if any) match the row names of the orthogroup expression set `og_eset`,
 #' - the variable in `design` (if any) are colnames of `colData`,
@@ -34,6 +35,14 @@ check_ogset <- function(object) {
         errors <- c(errors, msg)
     }
 
+    # Rownames of og_annos in names orthogroups
+    names_og <- names(object@og)
+    rownames_annos <- rownames(object@og_annos)
+    if (!all(rownames_annos %in% names_og)) {
+        msg <- "Rownames of og_annos must be contained in the names of the orthogroup list"
+        errors <- c(errors, msg)
+    }
+
     # column names of og_exp in rownames colData
     names_cols <- colnames(object@og_exp)
     names_coldata <- rownames(object@colData)
@@ -42,11 +51,14 @@ check_ogset <- function(object) {
         errors <- c(errors, msg)
     }
 
-    # rownames og og_exp in rownames rowData
+    # rownames of og_exp in rownames rowData
     names_rows <- rownames(object@og_exp)
-    names_rowndata <- rownames(object@rowData)
+    names_rowdata <- rownames(object@rowData)
     if (!all(dim(object@rowData) == c(0,0))) {
-        if(!all(names_rows == names_rowndata)) {
+        if(length(names_rows) != length(names_rowdata)) {
+            msg <- "The row names of og_exp must match the row names of rowData"
+            errors <- c(errors, msg)
+        } else if(!all(names_rows == names_rowdata)) {
             msg <- "The row names of og_exp must match the row names of rowData"
             errors <- c(errors, msg)
         }}
@@ -118,9 +130,10 @@ check_ogset <- function(object) {
 #'
 #' None of the arguments is required to initialize a ogset class element
 #'
-#' @param og A \code{list} of Orthogroups
+#' @param og A \code{list} of orthogroups
+#' @param og_annos a \code{data.frame} with functional annotations for the orthogroups
 #' @param og_exp A orthogroup-wise expression \code{data.frame}
-#' @param rowData A \code{data.frame} containing the functional annotation for the orthogroups
+#' @param rowData A \code{data.frame} containing the row metadata for the orthogroup expression set
 #' @param colData A \code{data.frame} containing the sample info for `og_exp`
 #' @param desing A \code{formula} describing the experimental design
 #' @param metadata A \code{list} of metadata
@@ -138,6 +151,7 @@ check_ogset <- function(object) {
 
 make_ogset <- setClass("ogset",
                        representation(og = "list",
+                                      og_annos = "data.frame",
                                       og_exp = "data.frame",
                                       rowData = "data.frame",
                                       colData = "data.frame",

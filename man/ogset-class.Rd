@@ -6,11 +6,13 @@
 \alias{make_ogset}
 \title{S4 Class, Container for Ortholog Expression Data}
 \arguments{
-\item{og}{A \code{list} of Orthogroups}
+\item{og}{A \code{list} of orthogroups}
+
+\item{og_annos}{a \code{data.frame} with functional annotations for the orthogroups}
 
 \item{og_exp}{A orthogroup-wise expression \code{data.frame}}
 
-\item{rowData}{A \code{data.frame} containing the functional annotation for the orthogroups}
+\item{rowData}{A \code{data.frame} containing the row metadata for the orthogroup expression set}
 
 \item{colData}{A \code{data.frame} containing the sample info for `og_exp`}
 

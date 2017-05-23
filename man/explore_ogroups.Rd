@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{explore_ogroups}
 \alias{explore_ogroups}
-\title{Plot an Histogram og Orthogroup Dimension}
+\title{Plot an Histogram of Orthogroup Dimension}
 \usage{
 explore_ogroups(groups, main = "dimension of orthogroups")
 }

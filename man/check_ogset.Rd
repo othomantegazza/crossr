@@ -13,6 +13,7 @@ check_ogset(object)
 The function \code{check_ogset} checks that in the provided object:
 \itemize{
 \item the names of the orthogroups (\code{og}) match the rownames of the orthogroup expression set \code{og_eset} (if any is given),
+\item the row names of og_annos are contained in the names of the orthogroup list
 \item the row names of \code{colData} (if any) match the column names of the orthogroup expression set \code{og_eset},
 \item the row names of \code{rowData} (if any) match the row names of the orthogroup expression set \code{og_eset},
 \item the variable in \code{design} (if any) are colnames of \code{colData},

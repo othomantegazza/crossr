@@ -109,7 +109,7 @@ plot_og_genes <- function(ogroup,
 
 
 
-#' Plot an Histogram og Orthogroup Dimension
+#' Plot an Histogram of Orthogroup Dimension
 #'
 #' \code{explore_ogroups} is a wrapper for the \code{plot} method for \code{table}
 #'

@@ -290,6 +290,7 @@ The `ogset` class is modeled on Bioconductor Summarized experiment class.
 When the `ogset` element is initialized, `make_ogset()` calls the function `check_ogset()` in order to check that the elements supplied match with each others. In details, `check_ogset()` checks that:
 
 - the names of the orthogroups (`og`) match the rownames of the orthogroup expression set `og_eset` (if any is given),
+- the row names of the annotations `og_annos` (if any) are contained in the names of the orthogroup list `og`,
 - the row names of `colData` (if any) match the column names of the orthogroup expression set `og_eset`,
 - the row names of `rowData` (if any) match the row names of the orthogroup expression set `og_eset`,
 - the variable in `design` (if any) are colnames of `colData`,
@@ -374,6 +375,49 @@ str(og_set@og_nomatch)
 ```
 
 After we have collapsed orthologues we can **check for consistency** of the `ogset` object with the function `check_ogset()`.
+
+```{r}
+check_ogset(og_set)
+```
+
+# Functional annotation for orthogroups
+
+In order to get rudimentary functional annotation for the orthogroups we simply associate to an orthogroup all the functional annotations of the genes composing it.
+
+In this example we use exclusively functional annotations of *A. thaliana*, since they are supposedly better than the annotations of *a. lyrata*.
+
+## Functional annotation in practice
+
+The feature names in the **feature table** of *A. thaliana* contain enough functional information for our purpose. This dataset was loaded in R under section 3 of this document in the object `thaliana_ids`.
+
+The transcript and protein ids are in the `product_accession` column of the `thaliana_ids` dataframe,
+
+```{r}
+head(thaliana_ids$product_accession)
+```
+
+while the functional annotations are in the `name` column.
+
+```{r}
+head(thaliana_ids$name)
+```
+
+We use this code to extract the annotations for orthogrups and save them in the `rowData` slot.
+
+```{r}
+get_annos <- function(ogroup) 
+{
+    annos <- thaliana_ids[thaliana_ids$product_accession %in% ogroup, "name"]
+    annos <- paste(unique(annos), collapse = " -- ")
+    return(annos)
+}
+
+og_set@og_annos <- data.frame(vapply(og_set@og, get_annos, character(1)))
+
+head(og_set@og_annos)
+```
+
+Afterward, as always, we can check for consistency of the og_set element.
 
 ```{r}
 check_ogset(og_set)
