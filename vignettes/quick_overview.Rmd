@@ -618,6 +618,8 @@ Orthogroup `r example_group` contains contains 4 genes, 2 from each species.
 
 The F-value associated to this group is `r og_set@stats[example_group, "spc:treat"]`, and it ranks `r which(names(get_top_tags(og_set, "spc:treat", Inf)) == example_group)` out of 500 groups.
 
+The associated annotation is: `r og_set@og_annos[example_group, "func_annos"]`(which is not incredibly helpful).
+
 Looks like it is behaving differently in response to heat in the 2 species;
 
 ```{r, fig.height=4, fig.width=5}
@@ -640,9 +642,28 @@ plot_og_genes(ogroup = example_group,
 
 # Clusters
 
-Ranking orthogroups by F-value of the interaction term and arbitrary cutoffs can be useful to detect genes that behave differently in the two species, but in this way we select genes that behave differently in any way.
+We rank orthogroups by F-value in order to extract orthogroups that behave differently in the two species. But in this way, we extract orthogroups that behave differently in any kind of way. 
 
-Clusters and heatmap can be useful in order to group together orthogroups that behave differently in a similar way and to make sense of it all.
+After extracting orthogroups that behave differently, we cluster their expression values in order to group the ones that behave differently in a similar way.
+
+We can use the function `get_top_tags()` in order to apply an arbtrary cutoff and to extract the top n differentially expressed orthogroups, in this case 50.
+
+```{r}
+n <- 50
+tt <- get_top_tags(ogset = og_set,
+                   rank = "spc:treat",
+                   n = n)
+```
+
+And then we cluster the the orthogroups with the `pheatmap()` function from the pheatmap package (but feel free to substitute it with your favourite clustering function if you prefer).
+
+```{r, fig.height=8, fig.width=13.5}
+pheatmap::pheatmap(t(scale(t(og_set@og_exp[names(tt), ]))),
+                   cluster_cols = FALSE,
+                   labels_row = paste(names(tt), og_set@og_annos[names(tt), "func_annos"], sep = ", "),
+                   cellheight = 10, cellwidth = 25)
+
+```
 
 
 
