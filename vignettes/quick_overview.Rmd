@@ -666,6 +666,26 @@ pheatmap::pheatmap(t(scale(t(og_set@og_exp[names(tt), ]))),
 ```
 
 
+# Known issues and limitations
+
+Applying the *crossr* workflow helped me a lot when I had to analyze cross-species RNA-seq datasets and when I had to extract biological observations from those data.
+
+Nevertheless *crossr* has know issues and limitations.
+
+## Limitations
+
+While writing *crossr* I favoured simplicity over statistical precision, therefore *crossr* relies on **explorative data analysis** methods and does not perform rigorous testing. 
+
+Making reliable statistical tests on cross-species transcriptomic data is a complicated and way beyond my expertise. Please, do not take reults on a low number of replicates (2, 3 or 5) as definitive. Consider validating your observations with more measurements.
+
+## Issues
+
+I have identified three issues with *crossr* workflow. I am currently learning how to deal with these issues.
+
+- Transcript isoforms are treated in the same way as transcript from other genes in the same orthogroup,
+- Log transformation before ranking the genes might not be the most reliable option available,
+- The cutoff between differentially expressed genes and non differentially expressed genes is arbitrary.
+
 
 # Session info
 
