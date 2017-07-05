@@ -67,7 +67,7 @@ done
 
 # Load Output from Salmon
  
-The fucntion `make_TPM_df()` loads the Salmon output in R. It takes as input the **path** to the folder that contains **all the Salmon output subfolders** for a species
+The function `make_TPM_df()` loads the Salmon output in R. It takes as input the **path** to the folder that contains **all the Salmon output subfolders** for a species
 
 In detail, the function `make_TPM_df()` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`, using the subfolder names as column ids.
 
@@ -204,9 +204,9 @@ Since orthogroups are inferred on protein sequences but short reads are mapped o
 
 The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
 
-In this case the **feature tables** containing the mapping were downladed from **NCBI** from the same folder as the proteomes. Again, the samples are in the `exdata` folder.
+In this case the **feature tables** containing the mapping were downloaded from **NCBI** from the same folder as the proteomes. Again, the samples are in the `exdata` folder.
 
-Loading the feature table from refseq can be challenging, and the issues encountered are often table specific. I ou experiences one of the main sources of issues can be special characters in gene names and gene annotation within the table, such as hashes ( \# ) and quotes ( ' ). The quotes can be find pretty often because they are used in the 5' and 3' notation.
+Loading the feature table from refseq can be challenging, and the issues encountered are often table specific. I my own experiences one of the main sources of issues can be special characters in gene names and gene annotation within the table, such as hashes ( \# ) and quotes ( ' ). The quotes can be find pretty often because they are used in the 5' and 3' notation.
 
 This code loads the *A. thaliana* feature table.
 ```{r}
@@ -269,7 +269,7 @@ Note that the orthogroups contain IDS from **both species**, therefore `switch_i
 
 # Implement a S4 object
 
-Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together the expression sets, annotoations and statistics that we have loaded and/or that we are going to produce.
+Now that we have loaded the expression data and the orthogroup data, we can start implementing an S4 element to organize and link together the expression sets, annotations and statistics that we have loaded and/or that we are going to produce.
 
 We suggest [this chapter](http://adv-r.had.co.nz/S4.html) from Hadley Wickham's ***Advanced R*** book for an introduction to S4 objects in R.
 
@@ -283,7 +283,7 @@ og_set <-  make_ogset(og = ogroups,
                        spec2_exp = lyrata)
 ```
 
-The `ogset` class is designed to store orthogroup expression data and metadata; it has slots for orthogroup expression data, list of genes in orthogroups, single species expression data, design and annotation data. None of these elements is necessary when initialising the object with `make_ogset()` and also an empty set can be initialized.
+The `ogset` class is designed to store orthogroup expression data and metadata; it has slots for orthogroup expression data, list of genes in orthogroups, single species expression data, design and annotation data. None of these elements is necessary when initializing the object with `make_ogset()` and also an empty set can be initialized.
 
 The `ogset` class is modeled on Bioconductor Summarized experiment class.
 
@@ -402,7 +402,7 @@ while the functional annotations are in the `name` column.
 head(thaliana_ids$name)
 ```
 
-We use this code to extract the annotations for orthogrups and save them in the `rowData` slot.
+We use this code to extract the annotations for orthogroups and save them in the `rowData` slot.
 
 ```{r}
 get_annos <- function(ogroup) 
@@ -448,7 +448,7 @@ In order to call it:
 
 ### Specify colData for orthogroup-wise expression
 
-The column data were previoulsy encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
+The column data were previously encoded in the colnames of the two expression sets from the two different species. Those names are preserved in the colnames of the ortholog expression set.
 
 ```{r}
 colnames(og_set@og_exp)
@@ -486,7 +486,7 @@ check_ogset(og_set)
 
 Now we can calculate the F-values with `add_fit()`. 
 
-We would suggest calculate the F-value on **log scaled value**, this is more approprite for studying relative changes. This could be done with the argument `log_scale = TRUE` to the `add_fit()`. In this way, the `add_fit()` function:
+We would suggest calculate the F-value on **log scaled value**, this is more appropriate for studying relative changes. This could be done with the argument `log_scale = TRUE` to the `add_fit()`. In this way, the `add_fit()` function:
  
 1. add 1 to the every observation in the orthogroup expression dataset,
 2. log transforms the data,
@@ -515,7 +515,7 @@ og_set@metadata
 head(og_set@stats)
 ```
 
-As mentioned above, the F-statistic associated to the interaction term `spc:treat` can be used as a ranking feature. The orthogroups with the highest F-value are the one that display a more divergent behaviour in the two species.
+As mentioned above, the F-statistic associated to the interaction term `spc:treat` can be used as a ranking feature. The orthogroups with the highest F-value are the one that display a more divergent behavior in the two species.
 
 The function `get_top_tags()` extracts the ID of the orthogroups with the highest F-value.
 
@@ -528,7 +528,7 @@ tt
 
 `get_top_tags()` returns a named numeric vector containing both the id of the top orthogroups and their associated statistics.
 
-We can extract the functional informations for the top tags with:
+We can extract the functional information for the top tags with:
 
 ```{r}
 og_set@og_annos[names(tt), ]
@@ -546,7 +546,7 @@ It requires as input:
 - the **species encoding** in the design formula (in this case `spc`)
 - the **condition encoding** in the design formula (in this case `treat`)
 
-The code below selects the highest differentally expressed group and plots it.
+The code below selects the highest differentially expressed group and plots it.
 
 ```{r, fig.height=4, fig.width=5}
 top_group <- names(get_top_tags(og_set, "spc:treat", 1))
@@ -591,7 +591,7 @@ plot_all_stages(orthogroup = top_group,
 
 The workflow of `crossr` relies on the assumption that **all the genes composing one orthogroup have the same function**. 
 
-If this **useful working assumption** was always verified, the expression values of those genes could be added without generating artefacts. Unfortunately this is not the case.
+If this **useful working assumption** was always verified, the expression values of those genes could be added without generating artifacts. Unfortunately this is not the case.
 
 Therefore we suggest that, before drawing any conclusion, the user should explore by plotting **also the expression pattern of the single genes** contained in the orthogroups that are differentially expressed.
 
@@ -646,7 +646,7 @@ We rank orthogroups by F-value in order to extract orthogroups that behave diffe
 
 After extracting orthogroups that behave differently, we cluster their expression values in order to group the ones that behave differently in a similar way.
 
-We can use the function `get_top_tags()` in order to apply an arbtrary cutoff and to extract the top n differentially expressed orthogroups, in this case 50.
+We can use the function `get_top_tags()` in order to apply an arbitrary cutoff and to extract the top n differentially expressed orthogroups, in this case 50.
 
 ```{r}
 n <- 50
@@ -676,7 +676,7 @@ Nevertheless *crossr* has know issues and limitations.
 
 While writing *crossr* I favoured simplicity over statistical precision, therefore *crossr* relies on **explorative data analysis** methods and does not perform rigorous testing. 
 
-Making reliable statistical tests on cross-species transcriptomic data is a complicated and way beyond my expertise. Please, do not take reults on a low number of replicates (2, 3 or 5) as definitive. Consider validating your observations with more measurements.
+Making reliable statistical tests on cross-species transcriptomic data is a complicated and way beyond my expertise. Please, do not take results on a low number of replicates (2, 3 or 5) as definitive. Consider validating your observations with more measurements.
 
 ## Issues
 
