@@ -1,5 +1,7 @@
 ## Crossr
 
+[![Build Status](https://travis-ci.org/othomantegazza/crossr.svg?branch=master)](https://travis-ci.org/othomantegazza/crossr)
+
 ### Overview
 
 *Crossr* is set of functions and a workflow that can be useful for quantitative comparison of transcriptomic data from different species.
