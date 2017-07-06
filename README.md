@@ -1,4 +1,4 @@
-## Crossr
+# Crossr
 
 [![Build Status](https://travis-ci.org/othomantegazza/crossr.svg?branch=master)](https://travis-ci.org/othomantegazza/crossr)
 
@@ -10,22 +10,30 @@
 
 ### Install
 
-in order to install *crossr* from Github you'll need to have the *devtools*
-package installed in R.
+In order to install *crossr* from Github you must first install the *devtools*
+package in R.
 
 To install *devtools* from CRAN, type:
 
 ```r
 install.packages("devtools")
 ```
-And then use it to install *crossr* with the function
+
+And then use it to install *crossr* by typing:
 
 ```r
 devtools::install_github("othomantegazza/crossr", build_vignettes = TRUE)
 ```
+
 By setting `build_vignettes = TRUE` (the default is `FALSE`), the installation
-will take a little longer but in the process you will build the vignettes that
+will take a little longer but in the process you will build the vignette that
 explain how to use *crossr*.
+
+Some images in the Vignette are built with the *pheatmap* package, which should be installed in R. If you haven't already, you can install the pheatmap package by typing:
+
+```r
+install.packages("pheatmap")
+```
 
 ### Use crossr
 
