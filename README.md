@@ -29,7 +29,7 @@ By setting `build_vignettes = TRUE` (the default is `FALSE`), the installation
 will take a little longer but in the process you will build the vignette that
 explain how to use *crossr*.
 
-Some images in the Vignette are built with the *pheatmap* package, which should be installed in R. If you haven't already, you can install the pheatmap package by typing:
+Some images in the Vignette are built with the *pheatmap* package, which must be installed in R. If you haven't already, you can install the pheatmap package by typing:
 
 ```r
 install.packages("pheatmap")
