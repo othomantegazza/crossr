@@ -16,17 +16,22 @@ vignette: >
 library(crossr)
 ```
 
-# Intro
+# Introduction
 
-Crossr is a set of function and a workflow that I use for quantitative comparison of gene expression in different species.
+The Crossr package contains a set of functions and a workflow that I use for quantitative comparison of gene expression in different species. 
 
-The package builds on the output of [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification and of [Orthofinder](https://github.com/davidemms/OrthoFinder) for matching homologues.
+To achieve this, crossr relies extensively on exploratory data analysis methods and not on strict statistical tests. Designing a statistical test for differential expression among species is very difficult because of the complexity of the underlying data and because of the low replicate number that we generally use in transcriptomic. 
 
-This vignette uses the [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077) dataset,  which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944) in order to explain the crossr workflow.
+Providing a full statistical test for differential expression among species is beyond the scope of this package and beyond my capability. What crossr provides instead is a simple explorative workflow that will allow you to make useful observation of how groups of homologous genes behave in different species.
 
-This authors of this dataset provide matched RNA-seq timepoints for heat shock and recovery of *Arabidopsis thaliana* and *Arabidopsis lyrata* samples, which are useful for illustrating the crossr workflow.
+Crossr builds on the output of :
 
-In order to make this vignette lighter, the workflow is run on a random subset of 500 orthogroups. The sample dataset is available in the exdata folder.
+- [Salmon](https://combine-lab.github.io/salmon/) for transcript quantification,
+- [Orthofinder](https://github.com/davidemms/OrthoFinder) to determine homology groups between the species.
+
+Here I will illustrate the workflow of crossr on the [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077) dataset,  which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944). This dataset contains matched RNA-seq samples of heat-shocked and recovered *Arabidopsis thaliana* and *Arabidopsis lyrata* plants. This experimental setup perfectly matches what crossr is designed for.
+
+In order to make this vignette lighter, I will use only a random subset of 500 orthogroups from original dataset. The sample dataset is available in the `exdata` folder.
 
 
 
