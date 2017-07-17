@@ -6,6 +6,8 @@ output:
   knitr:::html_vignette:
     toc: yes
     number_sections: true
+    theme: flatly
+    highlight: default
 vignette: >
   %\VignetteIndexEntry{overview of crossr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,7 +20,7 @@ library(crossr)
 
 # Introduction
 
-The Crossr package contains a set of functions and a workflow that I use for quantitative comparison of gene expression in different species. 
+Crossr contains a set of functions and a workflow that I use to compare gene expression levels between species. 
 
 To achieve this, crossr relies extensively on exploratory data analysis methods and not on strict statistical tests. Designing a statistical test for differential expression among species is very difficult because of the complexity of the underlying data and because of the low replicate number that we generally use in transcriptomic. 
 
@@ -37,13 +39,11 @@ In order to make this vignette lighter, I will use only a random subset of 500 o
 
 # Read Mapping
 
-Mapping of RNA-seq reads is not directly a part of the crossr workflow.
+Mapping of RNA-seq reads is not directly a part of the crossr workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
 
-Crossr requires two normalized expression matrix (one for each species taken into consideration) as starting point. We suggest to use expression values that are not dependent on the length of the gene such as transcript per million (TPM)
+For mapping of RNA-seq read we suggest **[Salmon](https://combine-lab.github.io/salmon/)** because it is fast, precise and easy to use. We also provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R.
 
-For mapping of RNA-seq read we suggest Salmon and we provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R.
-
-These are the **bash** commands that we use RNA-seq quantification with Salmon:
+These are the **bash** commands that we use to quantify  RNA-seq reads with Salmon:
 
 
 ```{bash, eval = FALSE}
@@ -74,18 +74,40 @@ done
  
 The function `make_TPM_df()` loads the Salmon output in R. It takes as input the **path** to the folder that contains **all the Salmon output subfolders** for a species
 
-In detail, the function `make_TPM_df()` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`, using the subfolder names as column ids.
+For example, the folder that contains the quantification for *A. thaliana* has this structure:
 
-This code gets the path to the Salmon output folder and builds the expression matrix for ***A. thaliana***.
+```
+thaliana
+├── SRR2033948
+│   └── quant.sf
+├── SRR2033949
+│   └── quant.sf
+├── SRR2033950
+│   └── quant.sf
+├── SRR2033951
+│   └── quant.sf
+├── SRR2033952
+│   └── quant.sf
+└── SRR2033953
+    └── quant.sf
 
-```{r}
-thaliana_path <- system.file("exdata/thaliana", package = "crossr")
-list.files(thaliana_path, recursive = T)
+### Output of $ tree -A inst/exdata/thaliana
 ```
 
+In detail, the function `make_TPM_df()` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`, using the subfolder names as column ids. It does not matter it the subfolders contain additional files, `make_TPM_df()` will ignore them.
+
+This code extracts TPM values and and builds the expression matrix for ***A. thaliana*** from the folder mentioned above.
+
 ```{r}
+##  get the path to the thaliana folder
+thaliana_path <- system.file("exdata/thaliana", package = "crossr") 
+thaliana_path
+
+## extract TPM and build dataframe
 thaliana <- make_TPM_df(thaliana_path)
-str(thaliana)
+
+## this is how it should look like
+head(thaliana)
 ```
 
 And the same for ***A. lyrata***
@@ -95,6 +117,8 @@ lyrata_path <- system.file("exdata/lyrata", package = "crossr")
 lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
+
+While we suggest Salmon, **crossr could take any kind of normalized gene expression values**. We suggest to use expression values such as transcript per million (TPM), that do not depend on gene length.
 
 ## Load sample metadata
 
