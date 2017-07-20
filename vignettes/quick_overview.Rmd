@@ -18,6 +18,7 @@ vignette: >
 library(crossr)
 ```
 
+
 # Introduction
 
 Crossr contains a set of functions and a workflow that I use to compare gene expression levels between species. 
@@ -72,13 +73,26 @@ done
 ```
 
 
-# Load Output from Salmon
- 
-The function `make_TPM_df()` loads the Salmon output in R. It takes as input the **path** to the folder that contains **all the Salmon output subfolders** for a species
+# Load mappping into R
 
-For example, the folder that contains the quantification for *A. thaliana* has this structure:
+You will have to load into R: transcript quantifications, and sample metadata.
+
+## Load transcript quantification from Salmon
+ 
+You can load the output of Salmon into R with the function `make_TPM_df()`. This function takes as input the **path** to the folder that the quantification output from Salmon.
+
+In detail, the function `make_TPM_df()`:
+
+1. extracts the TPM values from all the `quant.sf` files in every subfolder of the input path,
+2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This `data.frame` is the **expression matrix**.
+
+It does not matter it the subfolders contain additional files because `make_TPM_df()` will ignore them.
+
+In our example, the folder that contains the quantification for *A. thaliana* has this structure:
 
 ```
+bash> tree -A inst/exdata/thaliana
+
 thaliana
 ├── SRR2033948
 │   └── quant.sf
@@ -93,22 +107,18 @@ thaliana
 └── SRR2033953
     └── quant.sf
 
-### Output of $ tree -A inst/exdata/thaliana
 ```
 
-In detail, the function `make_TPM_df()` extracts the TPM from all the `quant.sf` files in every subfolder and organizes them in a `data.frame`, using the subfolder names as column ids. It does not matter it the subfolders contain additional files, `make_TPM_df()` will ignore them.
-
-This code extracts TPM values and and builds the expression matrix for ***A. thaliana*** from the folder mentioned above.
+With `make_TPM_df` we can extract the TPM values from all the `quant.sf` files and build the expression matrix.
 
 ```{r}
 ##  get the path to the thaliana folder
 thaliana_path <- system.file("exdata/thaliana", package = "crossr") 
-thaliana_path
 
-## extract TPM and build dataframe
+## extract TPMs and build dataframe
 thaliana <- make_TPM_df(thaliana_path)
 
-## this is how it should look like
+## this is how the top rows of the dataframe should look like
 head(thaliana)
 ```
 
@@ -120,11 +130,18 @@ lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
 
-While we suggest Salmon, **crossr could take any kind of normalized gene expression values**. We suggest to use expression values such as transcript per million (TPM), that do not depend on gene length.
+While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to load the expression matrix in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
+
+We anyway suggest to use expression values that:
+
+- are normalized for library size,
+- do not depend on gene length,
+
+for example transcript per million (TPM) is a good option.
 
 ## Load sample metadata
 
-In the expression matrices every column represents an RNAseq sample.
+In the expression matrix every column represents an RNAseq sample.
 
 Usually **sample metadata** are available they might be used to change the `colnames` of the expression sets from the sample ID to names that provide more immediate information. In this example we can use this [sample sheet](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) to do so.
 
