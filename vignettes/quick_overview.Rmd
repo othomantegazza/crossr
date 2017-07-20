@@ -41,31 +41,33 @@ In order to make this vignette lighter, I will use only a random subset of 500 o
 
 Mapping of RNA-seq reads is not directly a part of the crossr workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
 
-For mapping of RNA-seq read we suggest **[Salmon](https://combine-lab.github.io/salmon/)** because it is fast, precise and easy to use. We also provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R.
+For mapping of RNA-seq read we suggest **[Salmon](https://combine-lab.github.io/salmon/)** because it is fast, precise and easy to use. We also provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R. 
 
-These are the **bash** commands that we use to quantify  RNA-seq reads with Salmon:
-
+These are the **bash** commands that we use to quantify  RNA-seq reads with Salmon (at this moment we have tested the 0.8.2 version):
 
 ```{bash, eval = FALSE}
 ## make index
-./Salmon-0.7.2_linux_x86_64/bin/salmon\
+./Salmon-0.8.2_linux_x86_64/bin/salmon\
   index -t path/to/genome.fasta\
   -i th_transcripts_index\
   --type quasi -k 31
 
 
-## Quantify
+## Quantify and save mapping to SAM files for diagnostics
 for f in reads/*.fastq; do 
 
 base=${f%.fastq}
 echo $base
 base=${base#reads/}
 echo $base
+outsam=path/to/sam/folder/$base.sam
+echo $outsam
 
-./Salmon-0.7.2_linux_x86_64/bin/salmon quant \
+./Salmon-0.8.2_linux_x86_64/bin/salmon quant \
   -i path/to/index -l U \
   -r $f -o $base\
-  -p 8
+  -p 8\
+ --writeMappings=$outsam
 done
 ```
 
