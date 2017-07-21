@@ -6,7 +6,6 @@ output:
   knitr:::html_vignette:
     toc: yes
     number_sections: true
-    theme: flatly
     highlight: default
 vignette: >
   %\VignetteIndexEntry{overview of crossr}
@@ -84,7 +83,7 @@ You can load the output of Salmon into R with the function `make_TPM_df()`. This
 In detail, the function `make_TPM_df()`:
 
 1. extracts the TPM values from all the `quant.sf` files in every subfolder of the input path,
-2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This `data.frame` is the **expression matrix**.
+2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This `data.frame` is named **expression matrix** or **expression set**. 
 
 It does not matter it the subfolders contain additional files because `make_TPM_df()` will ignore them.
 
@@ -109,7 +108,7 @@ thaliana
 
 ```
 
-With `make_TPM_df` we can extract the TPM values from all the `quant.sf` files and build the expression matrix.
+With `make_TPM_df` we can extract the TPM values from all the `quant.sf` files and build the expression set.
 
 ```{r}
 ##  get the path to the thaliana folder
@@ -130,7 +129,9 @@ lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
 
-While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to load the expression matrix in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
+## Load quantification from other mapping algorithms
+
+While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to load the expression set in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
 
 We anyway suggest to use expression values that:
 
@@ -141,13 +142,13 @@ for example transcript per million (TPM) is a good option.
 
 ## Load sample metadata
 
-In the expression matrix every column represents an RNAseq sample.
+In the expression set every column represents an RNAseq sample, so now you might want to load in R also a table of metadata that describes the **experimental condition** under which every sample was harvested.
 
-Usually **sample metadata** are available they might be used to change the `colnames` of the expression sets from the sample ID to names that provide more immediate information. In this example we can use this [sample sheet](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) to do so.
+**Sample metadata** must be available if you are downloading RNAseq data from a public repository. If you are using your own data you will have to write the sample metadata yourself. 
 
-This code:
+In R the `data.frame` that stores sample metadata is generally named `coldata`, every row of `coldata` matches one RNAseq sample (and has to match one column of the expression matrix) and every column of `coldata´ stores information on an experimental variable.
 
-- loads the feature table into R,
+In this example we use this [sample metadata](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) set. We do not provide dedicated function for loading metadata into R because. To do so we can use `read.table` or any similar function. 
 
 ```{r}
 sample_info_path <- system.file("exdata",
@@ -158,9 +159,16 @@ sample_info <-  read.table(sample_info_path,
                            header = TRUE,
                            sep = "\t")  
 
+colnames(sample_info)
 ```
 
-- simplify the sample info so that they can be used as column name,
+As seen above, the sample metadata contain extensive and redundant information.
+
+Please, apply anything you know about [tidying datasets](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) to make the `coldata` more direct and easy to use.
+ 
+In this case:
+
+- **simplify info**,
 
 ```{r}
 reduce_info <- function(info) {
@@ -176,7 +184,7 @@ sample_info$etime <- paste(sample_info$etime,
                            sep = "_")
 ```
 
-- and set the sample info as column name of both datasets instead of the SRR id.
+- **set the sample info as column name of both datasets instead of the SRR id**,
 
 ```{r}
 switch_name <- function(name) {
@@ -195,6 +203,13 @@ colnames(lyrata) <- paste("lyr",
                           colnames(lyrata),
                           sep = "_")
 str(lyrata)
+```
+
+- **This is what our tidy `coldata` look like, with information on SRR id, organinsm and heat shock timing:**
+
+```{r}
+coldata_tidy <- sample_info[, c("Sample_Name_s", "Organism_s", "etime")]
+knitr::kable(coldata_tidy)
 ```
 
 
