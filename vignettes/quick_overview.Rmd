@@ -85,12 +85,12 @@ In detail, the function `make_TPM_df()`:
 1. extracts the TPM values from all the `quant.sf` files in every subfolder of the input path,
 2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This `data.frame` is named **expression matrix** or **expression set**. 
 
-It does not matter it the subfolders contain additional files because `make_TPM_df()` will ignore them.
+If the subfolders contain additional files `make_TPM_df()` will ignore them.
 
 In our example, the folder that contains the quantification for *A. thaliana* has this structure:
 
 ```
-bash> tree -A inst/exdata/thaliana
+bash$ tree -A inst/exdata/thaliana
 
 thaliana
 ├── SRR2033948
@@ -142,13 +142,13 @@ for example transcript per million (TPM) is a good option.
 
 ## Load sample metadata
 
-In the expression set every column represents an RNAseq sample, so now you might want to load in R also a table of metadata that describes the **experimental condition** under which every sample was harvested.
+In the expression set every column represents one RNAseq sample. Now you might want to load in R also a table of metadata that describes the **experimental condition** under which every sample was harvested.
 
 **Sample metadata** must be available if you are downloading RNAseq data from a public repository. If you are using your own data you will have to write the sample metadata yourself. 
 
-In R the `data.frame` that stores sample metadata is generally named `coldata`, every row of `coldata` matches one RNAseq sample (and has to match one column of the expression matrix) and every column of `coldata´ stores information on an experimental variable.
+In R the `data.frame` that stores sample metadata is conventionally named `coldata`, every row of `coldata` matches one RNAseq sample (and has to match one column of the expression matrix) and every column of `coldata stores information on an experimental variable.
 
-In this example we use this [sample metadata](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go) set. We do not provide dedicated function for loading metadata into R because. To do so we can use `read.table` or any similar function. 
+In this example we use [this sample metadata set](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go). We do not provide a function to load metadata into R, you can use the base function `read.table` or any similar function. Another good choice is the the [modern read_csv() function from the package readr](http://r4ds.had.co.nz/data-import.html). 
 
 ```{r}
 sample_info_path <- system.file("exdata",
@@ -159,16 +159,16 @@ sample_info <-  read.table(sample_info_path,
                            header = TRUE,
                            sep = "\t")  
 
-colnames(sample_info)
+str(sample_info)
 ```
 
 As seen above, the sample metadata contain extensive and redundant information.
 
-Please, apply anything you know about [tidying datasets](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) to make the `coldata` more direct and easy to use.
+Please, apply anything you know about [tidying datasets](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) to make `coldata` more direct and easier to use.
  
 In this case:
 
-- **simplify info**,
+- **simplify and compress how the experimental condition are expressed**,
 
 ```{r}
 reduce_info <- function(info) {
@@ -182,9 +182,10 @@ sample_info$etime <- vapply(sample_info$exposure_time_s,
 sample_info$etime <- paste(sample_info$etime,
                            c(1, 2),
                            sep = "_")
+sample_info$etime
 ```
 
-- **set the sample info as column name of both datasets instead of the SRR id**,
+- **and use them as column names of the expression set instead of the SRR ids**,
 
 ```{r}
 switch_name <- function(name) {
@@ -205,10 +206,10 @@ colnames(lyrata) <- paste("lyr",
 str(lyrata)
 ```
 
-- **This is what our tidy `coldata` look like, with information on SRR id, organinsm and heat shock timing:**
+- **Discard any superfluous column**, in this case wee keep only the SRR id, organinsm id, and heat shock timing.
 
 ```{r}
-coldata_tidy <- sample_info[, c("Sample_Name_s", "Organism_s", "etime")]
+coldata_tidy <- sample_info[, c("Run_s", "Organism_s", "etime")]
 knitr::kable(coldata_tidy)
 ```
 
