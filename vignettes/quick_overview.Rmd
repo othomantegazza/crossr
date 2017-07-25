@@ -22,7 +22,7 @@ library(crossr)
 
 Crossr contains a set of functions and a workflow that I use to compare gene expression levels between species. 
 
-To achieve this, crossr relies extensively on exploratory data analysis methods and not on strict statistical tests. Designing a statistical test for differential expression among species is very difficult because of the complexity of the underlying data and because of the low replicate number that we generally use in transcriptomic. 
+To achieve this, crossr relies extensively on exploratory data analysis methods and not on strict statistical tests. Designing a statistical test for differential expression among species is very difficult because of the complexity of the underlying data and because of the low replicate number that we generally use in transcriptomics experiments. 
 
 Providing a full statistical test for differential expression among species is beyond the scope of this package and beyond my capability. What crossr provides instead is a simple explorative workflow that will allow you to make useful observation of how groups of homologous genes behave in different species.
 
@@ -33,17 +33,17 @@ Crossr builds on the output of :
 
 Here I will illustrate the workflow of crossr on the [GSE69077](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE69077) dataset,  which was published by [Rawat et al. in 2015](https://www.ncbi.nlm.nih.gov/pubmed/26382944). This dataset contains matched RNA-seq samples of heat-shocked and recovered *Arabidopsis thaliana* and *Arabidopsis lyrata* plants. This experimental setup perfectly matches what crossr is designed for.
 
-In order to make this vignette lighter, I will use only a random subset of 500 orthogroups from original dataset. The sample dataset is available in the `exdata` folder.
+In order to make this vignette lighter, I will use only a random subset of 500 orthogroups from original dataset. The simplified dataset is available in the `exdata` folder.
 
 
 
-# Read Mapping
+# Read Mapping and quantification
 
-Mapping of RNA-seq reads is not directly a part of the crossr workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
+Mapping of RNA-seq reads is not directly a part of crossr's workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
 
-For mapping of RNA-seq read we suggest **[Salmon](https://combine-lab.github.io/salmon/)** because it is fast, precise and easy to use. We also provide the `make_TPM_df()` function that parses and loads the Salmon output directly into R. 
+The RNA-seq reads can be mapped with **[Salmon](https://combine-lab.github.io/salmon/)**. Salmon is fast, precise and easy to use, moreover it directly quantifies gene/transcript expression and provides this as an output. To parse and load the output from Salmon into R we provide the function `make_TPM_df()`.
 
-These are the **bash** commands that we use to quantify  RNA-seq reads with Salmon (at this moment we have tested the 0.8.2 version):
+These are the **bash** commands that we use to quantify  RNA-seq reads with Salmon (at this moment we have tested Salmon version 0.8.2):
 
 ```{bash, eval = FALSE}
 ## make index
@@ -72,9 +72,9 @@ done
 ```
 
 
-# Load mappping into R
+# Load transcript quantification and metadata into R
 
-You will have to load into R: transcript quantifications, and sample metadata.
+You will have to load into R transcript quantifications and sample metadata.
 
 ## Load transcript quantification from Salmon
  
@@ -83,7 +83,7 @@ You can load the output of Salmon into R with the function `make_TPM_df()`. This
 In detail, the function `make_TPM_df()`:
 
 1. extracts the TPM values from all the `quant.sf` files in every subfolder of the input path,
-2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This `data.frame` is named **expression matrix** or **expression set**. 
+2. organizes those values in a `data.frame` using the **subfolder names** as column ids and the feature names as row ids. This kind of `data.frame` is named **expression matrix** or **expression set**. 
 
 If the subfolders contain additional files `make_TPM_df()` will ignore them.
 
@@ -114,7 +114,7 @@ With `make_TPM_df` we can extract the TPM values from all the `quant.sf` files a
 ##  get the path to the thaliana folder
 thaliana_path <- system.file("exdata/thaliana", package = "crossr") 
 
-## extract TPMs and build dataframe
+## extract TPMs and build a dataframe
 thaliana <- make_TPM_df(thaliana_path)
 
 ## this is how the top rows of the dataframe should look like
@@ -129,11 +129,11 @@ lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
 
-## Load quantification from other mapping algorithms
+## Load quantifications from other mapping algorithms
 
 While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to load the expression set in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
 
-We anyway suggest to use expression values that:
+Anyway, we suggest to **use expression values that**:
 
 - are normalized for library size,
 - do not depend on gene length,
@@ -142,11 +142,11 @@ for example transcript per million (TPM) is a good option.
 
 ## Load sample metadata
 
-In the expression set every column represents one RNAseq sample. Now you might want to load in R also a table of metadata that describes the **experimental condition** under which every sample was harvested.
+Now you might want to load into R also a table of metadata that describes the **experimental condition** under which every RNAseq sample was harvested. 
 
 **Sample metadata** must be available if you are downloading RNAseq data from a public repository. If you are using your own data you will have to write the sample metadata yourself. 
 
-In R the `data.frame` that stores sample metadata is conventionally named `coldata`, every row of `coldata` matches one RNAseq sample (and has to match one column of the expression matrix) and every column of `coldata stores information on an experimental variable.
+In R, the `data.frame` that stores sample metadata is conventionally named `coldata`. Every row of `coldata` matches one RNAseq sample (and has to match one column of the expression matrix) and every column of `coldata stores information on an experimental variable.
 
 In this example we use [this sample metadata set](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=SRP058527&go=go). We do not provide a function to load metadata into R, you can use the base function `read.table` or any similar function. Another good choice is the the [modern read_csv() function from the package readr](http://r4ds.had.co.nz/data-import.html). 
 
@@ -166,7 +166,7 @@ As seen above, the sample metadata contain extensive and redundant information.
 
 Please, apply anything you know about [tidying datasets](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) to make `coldata` more direct and easier to use.
  
-In this case:
+This is how we have proceeded on this dataset:
 
 - **simplify and compress how the experimental condition are expressed**,
 
@@ -214,11 +214,26 @@ knitr::kable(coldata_tidy)
 ```
 
 
-# Homology groups
+# Homology groups (orthogroups)
 
-The homology groups are called orthogroups in [Orthofinder](https://github.com/davidemms/OrthoFinder) and are defined as:
+When we analyze an RNA-seq experiment that was performed on samples originating from **one single species**, we generally:
+
+1. Quantify the expression of every gene in the genome across different condition or in different tissues,
+2. Compare the expression of every gene with itself across the different condition.
+
+We rarely compare expression of one gene with another, mainly because we do not know if our quantification method is **sequence biased**.
+
+Adapting this protocol to **multispecies experiments** presents a very important issue: different species have different set of genes with (almost always) different sequences. 
+
+This is part of a bigger issue: when we compare gene expression between different species, which gene from one species should be compared with which gene from the other? 
+
+To tackle this problem we first define groups of genes that descend from one single gene in the last common ancestor. These are known as "homology groups" or "orthogroups. Many computational packages infer this relationship. We generally use [Orthofinder](https://github.com/davidemms/OrthoFinder).
+
+Orthofinder infers orthogroups from the proteomes, and indeed defines an orthogroup as:
 
 > The set of genes that are descended from a single gene in the last common ancestor of all the species being considered.
+
+We can start solving the issues of multispecies transcriptomic comparison from here: genes in the same orthogroup might have the same function.
 
 ## Ortholog inference
 
