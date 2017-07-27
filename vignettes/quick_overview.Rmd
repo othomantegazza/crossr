@@ -37,7 +37,7 @@ In order to make this vignette lighter, I will use only a random subset of 500 o
 
 
 
-# Read Mapping and quantification
+# Read Mapping and transcript quantification
 
 Mapping of RNA-seq reads is not directly a part of crossr's workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
 
@@ -72,13 +72,13 @@ done
 ```
 
 
-# Load transcript quantification and metadata into R
+# Import transcript quantification and metadata in R
 
-You will have to load into R transcript quantifications and sample metadata.
+You will have to import in R transcript quantifications and sample metadata.
 
-## Load transcript quantification from Salmon
+## Import transcript quantification from Salmon
  
-You can load the output of Salmon into R with the function `make_TPM_df()`. This function takes as input the **path** to the folder that the quantification output from Salmon.
+You can import the output of Salmon into R with the function `make_TPM_df()`. This function takes as input the **path** to the folder that the quantification output from Salmon.
 
 In detail, the function `make_TPM_df()`:
 
@@ -129,9 +129,9 @@ lyrata <- make_TPM_df(lyrata_path)
 str(lyrata)
 ```
 
-## Load quantifications from other mapping algorithms
+## Import quantifications from other mapping algorithms
 
-While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to load the expression set in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
+While we suggest Salmon, you can use crossr downstream of **any mapping algorithm** but you will have to import the expression set in R by yourself. The package [tximport](http://bioconductor.org/packages/release/bioc/html/tximport.html) can help.
 
 Anyway, we suggest to **use expression values that**:
 
@@ -140,9 +140,9 @@ Anyway, we suggest to **use expression values that**:
 
 for example transcript per million (TPM) is a good option.
 
-## Load sample metadata
+## Import sample metadata
 
-Now you might want to load into R also a table of metadata that describes the **experimental condition** under which every RNAseq sample was harvested. 
+Now you might want to Import in R also a table of metadata that describes the **experimental condition** under which every RNAseq sample was harvested. 
 
 **Sample metadata** must be available if you are downloading RNAseq data from a public repository. If you are using your own data you will have to write the sample metadata yourself. 
 
@@ -190,9 +190,10 @@ sample_info$etime
 ```{r}
 switch_name <- function(name) {
     if(name %in% sample_info$Run_s) {
-    sample_info[sample_info$Run_s == name, "etime", drop = TRUE]
-    } else name
-    }
+        new_name <- sample_info[sample_info$Run_s == name, "etime", drop = TRUE]
+        return(new_name)
+    } else return(name)
+}
 colnames(thaliana) <- vapply(colnames(thaliana), switch_name, character(1))
 colnames(thaliana) <- paste("thal",
                             colnames(thaliana),
@@ -256,17 +257,17 @@ python OrthoFinder-master/orthofinder.py -f path/to/proteomes -t 3
 python OrthoFinder-master/orthofinder.py -b path/to/results/WorkingDirectory
 ```
 
-## Load orthogroups
+## Import orthogroups in R
 
-The orthogroups are provided in the `OrthologousGroups.csv` file in Orthofinder's output.
-Orthofinder provides both an `OrthologousGroups.csv` file and `OrthologousGroups.txt` file. 
+Orthofinder outputs two equivalent orthogroup files in two different formats: `OrthologousGroups.csv` and `OrthologousGroups.txt`.
 
-The function `parse_orthogroups()` takes as input the path to the `OrthologousGroups.csv` file that you want to parse and load in R. Please note that `parse_orthogroups()` is designed for parsing **exclusively the *.csv* file** and not the *.txt* one.
+In order to parse the `OrthologousGroups.csv` file, we provide the function `parse_orthogroups()`. This function takes as input the path to the `OrthologousGroups.csv` file. Please note that `parse_orthogroups()` is designed for parsing **exclusively the *.csv* file** and not the *.txt* one.
 
 ```{r}
-ogroups_path <- system.file("exdata",
+(ogroups_path <- system.file("exdata",
                             "ogroups_sample.csv",
-                            package = "crossr")
+                            package = "crossr"))
+
 ogroups <- parse_orthogroups(ogroups_path)
 ```
 
@@ -283,9 +284,9 @@ Since orthogroups are inferred on protein sequences but short reads are mapped o
 
 The function `switch_ids()` performs this task. It requires an external file that maps the protein ID to transcript ID, which must be loaded in R.
 
-In this case the **feature tables** containing the mapping were downloaded from **NCBI** from the same folder as the proteomes. Again, the samples are in the `exdata` folder.
+We have downloaded the **feature tables** that containsmappings between transcript ID and protein ID from **NCBI** from the same folder as the proteomes. Also this file is stored in the `exdata` folder.
 
-Loading the feature table from refseq can be challenging, and the issues encountered are often table specific. I my own experiences one of the main sources of issues can be special characters in gene names and gene annotation within the table, such as hashes ( \# ) and quotes ( ' ). The quotes can be find pretty often because they are used in the 5' and 3' notation.
+Importing the feature tables from refseq into R can be challenging and the issues encountered are often table specific. In our experience, issues can arise from special characters in gene names and gene functional annotation within the table, such as hashes ( \# ) and quotes ( ' ). Functional annotations often contain quotes because this symbol is used in the 5' and 3' notation.
 
 This code loads the *A. thaliana* feature table.
 ```{r}
@@ -438,7 +439,7 @@ The basic **assumption** of this method is that **genes in the same orthogroup h
 The function `collapse_orthologs()` performs this task on an `ogset` class element, and returns the same element with the collapsed orthogroup expression set in the designated slot.
 
 ```{r}
-og_set <- collapse_orthologs(og_set, mc.cores = 1)
+og_set <- collapse_orthologs(og_set, mc.cores = 1)  ## This could take a while.
 ```
 
 Not all orthogroups contain genes from both species, the orthogroups that contain genes and hence expression data from both species are stored in the slot `og_exp` for further analysis,
