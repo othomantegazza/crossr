@@ -464,25 +464,30 @@ check_ogset(og_set)
 
 In order to get rudimentary functional annotations for the orthogroups we simply associate to an orthogroup all the functional annotations of the genes composing it.
 
-In this example we use exclusively functional annotations of *A. thaliana*, since they are supposedly better than the annotations of *a. lyrata*.
+In this example we use functional annotations from *A. thaliana* exclusively, because they are more reliable than the ones from *A. lyrata*.
 
 ## Functional annotations in practice
 
-The feature names in the **feature table** of *A. thaliana* contain enough functional information for our purpose. This dataset was loaded in R under section 3 of this document in the object `thaliana_ids`.
+The **features names** from the **feature table** of *A. thaliana* (the one that we have imported in Section 5 in the object `thaliana_ids`) contain enough functional information for our purpose. 
 
-The transcript and protein ids are in the `product_accession` column of the `thaliana_ids` dataframe,
+The `thaliana_ids` object stores both **features names** and **transcript ids**, thus we can use this table to associate functional annotations to the transcripts contained in the orthogroups.
+
+These **transcript ids** are stored the `product_accession` column of the `thaliana_ids` dataframe,
 
 ```{r}
 head(thaliana_ids$product_accession)
 ```
 
-while the functional annotations are in the `name` column.
+while the **features names** are in the `name` column.
 
 ```{r}
-head(thaliana_ids$name)
+head(thaliana_ids$name, 10)
 ```
 
-We use this code to extract the annotations for orthogroups and save them in the `rowData` slot.
+With this code snippet we can:
+
+1.  collect functional annotations for each orthogroup
+2.  store them in the `rowData` slot.
 
 ```{r}
 get_annos <- function(ogroup) 
@@ -492,7 +497,9 @@ get_annos <- function(ogroup)
     return(annos)
 }
 
-og_set@og_annos <- data.frame(func_annos = vapply(og_set@og, get_annos, character(1)),
+og_set@og_annos <- data.frame(func_annos = vapply(og_set@og,
+                                                  get_annos,
+                                                  character(1)),
                               stringsAsFactors = FALSE)
 
 head(og_set@og_annos)
