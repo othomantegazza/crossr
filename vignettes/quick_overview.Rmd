@@ -37,7 +37,7 @@ In order to make this vignette lighter, I will use only a random subset of 500 o
 
 
 
-# Read Mapping and transcript quantification
+# Map RNA-seq Reads and Quantify Transcripts
 
 Mapping of RNA-seq reads is not directly a part of crossr's workflow. Crossr requires only two normalized gene expression matrices (one for each species taken into consideration) as starting point.
 
