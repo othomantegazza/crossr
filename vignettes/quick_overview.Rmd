@@ -624,7 +624,7 @@ og_set@og_annos[names(tt), ]
 
 ## Plot orthogroup expression
 
-The function `plot_all_stages` plots a stripchart of the expression of the supplied orthogroup.
+The function `plot_all_stages` is a wrapper fot ggplot2 that plots a stripchart of the expression of the supplied orthogroup.
 
 It requires as input:
 
@@ -637,24 +637,20 @@ The code below selects the highest differentially expressed group and plots it.
 
 ```{r, fig.height=4, fig.width=5}
 top_group <- names(get_top_tags(og_set, "spc:treat", 1))
-plot_all_stages(orthogroup = top_group,
-                ogset = og_set,
-                species = "spc",
-                condition = "treat",
-                ylab = "Log Scaled TPM")
+ggplot_all_stages(orthogroups = top_group,
+                       condition_var = "treat",
+                       species_var = "spc",
+                       ogset = og_set)
 ```
 
-This can be combined with faceting in order to plot the expression of multiple orthogroups. These lines of code select and plot the top 12 differentially expressed orthogroups in a 4X3 faceting
-
-```{r, fig.height=9, fig.width=7, results='hide'}
+If multiple orhogroups are supplied, `ggplot_all_stages` plots them all separately using facetting. This code selects the top 12 differentially expressed orthogroups and plots their expression.
+ 
+```{r, fig.height=5, fig.width=8, results='hide'}
 tt <- names(get_top_tags(og_set, "spc:treat", 12))
-par(mfrow = c(4, 3))
-sapply(tt,
-       plot_all_stages,
-       ogset = og_set,
-       species = "spc",
-       condition = "treat",
-       ylab = "Log Scaled TPM")
+ggplot_all_stages(orthogroups = tt,
+                       condition_var = "treat",
+                       species_var = "spc",
+                       ogset = og_set)
 ```
 
 Functional annotation can be displayed in the plot subtitle with the arguments `use_annos` and `annos_col`.
