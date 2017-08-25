@@ -28,7 +28,7 @@ If you haven't installed *ggplot2* and *pheatmap* already, you can install them 
 install.packages("ggplot2", "pheatmap")
 ```
 
-And then use it to install *crossr* by typing:
+Then you can use *devtools* to install *crossr* by typing:
 
 ```r
 devtools::install_github("othomantegazza/crossr", build_vignettes = TRUE)
