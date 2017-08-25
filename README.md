@@ -18,6 +18,15 @@ To install *devtools* from CRAN, type:
 ```r
 install.packages("devtools")
 ```
+Some images in *crossr*'s Vignette require the *ggplot2* and *pheatmap* packages. To build the Vignette, 
+those packages must be installed in R.
+*ggplot2* is also needed for other plotting functionalities of *crossr*.
+
+If you haven't installed *ggplot2* and *pheatmap* already, you can install them by typing:
+
+```r
+install.packages("ggplot2", "pheatmap")
+```
 
 And then use it to install *crossr* by typing:
 
@@ -26,14 +35,10 @@ devtools::install_github("othomantegazza/crossr", build_vignettes = TRUE)
 ```
 
 By setting `build_vignettes = TRUE` (the default is `FALSE`), the installation
-will take a little longer but in the process you will build the vignette that
-explain how to use *crossr*.
+will take a little longer but in the process you will build the Vignette that
+explains how to use *crossr*.
 
-Some images in the Vignette are built with the *pheatmap* package, which must be installed in R. If you haven't already, you can install the pheatmap package by typing:
 
-```r
-install.packages("pheatmap")
-```
 
 ### Use crossr
 
