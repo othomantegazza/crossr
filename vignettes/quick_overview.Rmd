@@ -635,12 +635,12 @@ It requires as input:
 
 The code below selects the highest differentially expressed group and plots it.
 
-```{r, fig.height=4, fig.width=5}
+```{r, fig.height=3.5, fig.width=4.5}
 top_group <- names(get_top_tags(og_set, "spc:treat", 1))
 ggplot_all_stages(orthogroups = top_group,
-                       condition_var = "treat",
-                       species_var = "spc",
-                       ogset = og_set)
+                  condition_var = "treat",
+                  species_var = "spc",
+                  ogset = og_set)
 ```
 
 If multiple orhogroups are supplied, `ggplot_all_stages` plots them all separately using facetting. This code selects the top 12 differentially expressed orthogroups and plots their expression.
@@ -648,26 +648,21 @@ If multiple orhogroups are supplied, `ggplot_all_stages` plots them all separate
 ```{r, fig.height=5, fig.width=8, results='hide'}
 tt <- names(get_top_tags(og_set, "spc:treat", 12))
 ggplot_all_stages(orthogroups = tt,
-                       condition_var = "treat",
-                       species_var = "spc",
-                       ogset = og_set)
+                  condition_var = "treat",
+                  species_var = "spc",
+                  ogset = og_set)
 ```
 
-Functional annotation can be displayed in the plot subtitle with the arguments `use_annos` and `annos_col`.
-If you plan to display functional annotation, we suggest you to increase the upper margin of the plot with the function `par()`.
+You can use the `use_annos` parameter to display functional annotation in the facet titles.
 
-```{r, fig.height=4.5, fig.width=5}
-par(mar = c(3, 4, 7, 2))
 
+```{r, fig.height=3.5, fig.width=4.5}
 top_group <- names(get_top_tags(og_set, "spc:treat", 1))
-plot_all_stages(orthogroup = top_group,
-                ogset = og_set,
-                species = "spc",
-                condition = "treat",
-                use_annos = TRUE,
-                annos_col = "func_annos",
-                ylab = "Log Scaled TPM")
-
+ggplot_all_stages(orthogroups = top_group,
+                  condition_var = "treat",
+                  species_var = "spc",
+                  ogset = og_set,
+                  use_annos = TRUE)
 ```
  
 ## Plot all the genes composing a specific orthogroup

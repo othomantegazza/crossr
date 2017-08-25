@@ -112,15 +112,28 @@ ggplot_all_stages <- function(orthogroups,
                                colours = c("darkblue", "#56B4E9"),
                                use_annos = FALSE)
 {
+    if(use_annos) {
+        if(nrow(ogset@og_annos) == 0) {
+            stop("the og_annos slot is empty,
+        please provide functional annotations in og_annos slot of ogset or set use_annos = FALSE")
+        }
+    }
     dset <- ogset@og_exp
     dset <- lapply(orthogroups, function(i) {
         dat <- cbind(t(dset[i, ]), ogset@colData)
         colnames(dat)[1] <- "TPM"
         dat$ogroup <- i
-        dat$ogroup <- as.factor(dat$ogroup)
         return(dat)
     })
     dset <- do.call(rbind, dset)
+    if(use_annos) {
+        for(i in 1:length(dset$ogroup)) {
+            dset$ogroup[i] <- paste(dset$ogroup[i],
+                                    ogset@og_annos[dset$ogroup[i], 1],
+                                    sep = "\n")
+        }
+    }
+    dset$ogroup <- as.factor(dset$ogroup)
     p_out <- ggplot2::ggplot(data = dset,
                              ggplot2::aes_string(x = condition_var,
                                                  y = "TPM",
@@ -132,7 +145,10 @@ ggplot_all_stages <- function(orthogroups,
         ggplot2::stat_summary(fun.y = stats::median,
                               geom= "line",
                               lty = 2) +
-        ggplot2::scale_colour_manual(values = colours) +
+        ggplot2::scale_colour_manual(values = colours,
+                                     name = "Species") +
+        ggplot2::scale_shape(name = "Species") +
+        ggplot2::xlab(label = "Condition") +
         ggplot2::facet_wrap(~ ogroup,
                             scales = "free_y")
     return(p_out)
