@@ -26,5 +26,6 @@ Suggests:
     knitr (>= 1.15.1),
 		rmarkdown (>= 1.4),
 		devtools (>= 1.12.0),
-		pheatmap (>= 1.0.8)
+		pheatmap (>= 1.0.8),
+		ggplot2 (>= 2.2.1)
 VignetteBuilder: knitr

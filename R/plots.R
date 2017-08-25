@@ -79,6 +79,66 @@ plot_all_stages <- function(orthogroup,
                      lty = c(2, 3), bty = "n")
 }
 
+#' Plot the Expression of One Orthogroup in Both Species with ggplot2
+#'
+#' \code{ggplot_all_stages} is a wrapper for ggplot2 that plots a stripchart
+#' and a line plot of the expression of an orthogroup in both species.
+#'
+#' This function takes one (ot many) orthogroup IDs and an ogset class element as arguments.
+#' It plots a stripchart of the expression of all the stages.
+#'
+#' You can also provided a vector of multiple orthogroup IDs, \code{ggplot_all_stages} will plot
+#' all of them using faceting.
+#'
+#' The function returns a ggplot object that can be further customized with all basic
+#' ggplot2 functionalities.
+#'
+#' @param orthogroups a \code{character} vector with the orthogroups for the plot
+#' @param ogset an ogset class element
+#' @param species_var a \code{character} string with the name of column of coldata that encodes
+#' for the species from which the samples originates.
+#' @param condition_var a \code{character} string with the name of column of coldata that encodes the experimental
+#' conditions under which you are comparing the samples
+#' @param colours a \code{character} vector with the colours for the plot
+#' @param use_annos \code{logical}; if \code{TRUE} the functional annotation from og_annos will
+#'  be displayed in the plot subtitle. Defaults to \code{FALSE}
+#'
+#' @export
+
+ggplot_all_stages <- function(orthogroups,
+                               ogset,
+                               species_var,
+                               condition_var,
+                               colours = c("darkblue", "#56B4E9"),
+                               use_annos = FALSE)
+{
+    dset <- ogset@og_exp
+    dset <- lapply(orthogroups, function(i) {
+        dat <- cbind(t(dset[i, ]), ogset@colData)
+        colnames(dat)[1] <- "TPM"
+        dat$ogroup <- i
+        dat$ogroup <- as.factor(dat$ogroup)
+        return(dat)
+    })
+    dset <- do.call(rbind, dset)
+    p_out <- ggplot2::ggplot(data = dset,
+                             ggplot2::aes_string(x = condition_var,
+                                                 y = "TPM",
+                                                 colour = species_var,
+                                                 group = species_var,
+                                                 pch = species_var)) +
+        ggplot2::geom_jitter(width = .1,
+                             height = 0) +
+        ggplot2::stat_summary(fun.y = stats::median,
+                              geom= "line",
+                              lty = 2) +
+        ggplot2::scale_colour_manual(values = colours) +
+        ggplot2::facet_wrap(~ ogroup,
+                            scales = "free_y")
+    return(p_out)
+
+}
+
 #' Plot the Expression of all Genes within one Orthogroup
 #'
 #' \code{plot_og_gene} is a wrapper for \code{stripchart} and plots a stripchart
