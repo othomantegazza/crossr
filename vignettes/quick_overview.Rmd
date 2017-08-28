@@ -675,11 +675,9 @@ Therefore we suggest that, before drawing any conclusion, the user should explor
 
 This can be achieved with the function `plot_og_genes`, that prints the number and the ID of the genes composing the user supplied orthogroup and plot their expression.
 
-```{r, fig.width=9}
-par(mfrow = c(1, 2))
-plot_og_genes(ogroup = top_group,
-              ogset = og_set,
-              ylab = "TPM")
+```{r, fig.height=3.5, fig.width=7}
+ggplot_ogroup_genes(orthogroup = top_group, 
+                    ogset = og_set)
 ```
 
 The orthogroup `r top_group` contains only 2 genes, but we can expect orthogroups of different size and different ratios of genes from one species and from the other.
@@ -700,21 +698,18 @@ The associated annotation is: `r og_set@og_annos[example_group, "func_annos"]`(w
 
 Looks like it is behaving differently in response to heat in the 2 species;
 
-```{r, fig.height=4, fig.width=5}
-plot_all_stages(orthogroup = example_group,
-                ogset = og_set,
-                species = "spc",
-                condition = "treat",
-                ylab = "Log Scaled TPM")
+```{r, fig.height=3.5, fig.width=4.5}
+ggplot_all_stages(orthogroups = example_group,
+                  condition_var = "treat",
+                  species_var = "spc",
+                  ogset = og_set)
 ```
 
 and it contains 4 genes of which one is behaving peculiarly differently than the others.
 
-```{r, fig.height=6, fig.width=6}
-par(mfrow = c(2, 2))
-plot_og_genes(ogroup = example_group,
-              ogset = og_set,
-              ylab = "TPM")
+```{r, fig.height=6, fig.width=7}
+ggplot_ogroup_genes(orthogroup = example_group, 
+                    ogset = og_set)
 ```
 
 

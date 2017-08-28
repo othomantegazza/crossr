@@ -202,7 +202,65 @@ plot_og_genes <- function(ogroup,
                   ylab = ylab)
 }
 
+#' Plot the Expression of all Genes within one Orthogroup with ggplot2
+#'
+#' \code{ggplot_ogroup_genes} is a wrapper for \code{ggplot2} that plots a stripchart
+#' of the expression of all the gene contained in a orthogroup
+#'
+#' @param orthogroup the orthogroup that you want to plot
+#' @param ogset the \code{ogset} class element that contains the expression data
+#'
+#' @export
 
+ggplot_ogroup_genes <- function(orthogroup,
+                                ogset)
+{
+    if(is.null(ogset@exp_cond)) {stop("ogset@exp_cond is empty, please supply the name of
+                                      the variable that encodes for the experimental condition in coldata into
+                                      the exp_cond slot of ogset")}
+    genes <- ogset@og[[orthogroup]]
+    top_info <- paste("the ", orthogroup, " orthogroup contains ", length(genes), " genes: ",
+                      paste(genes, collapse = ", "),
+                      sep = "")
+    genes_list <- vector("list", length = length(genes))
+    names(genes_list) <- genes
+
+    for(gene_id in names(genes_list)) {
+        if(gene_id %in% rownames(ogset@spec1_exp)) {
+            TPM <- ogset@spec1_exp[gene_id, ]
+            rownames(TPM) <- "TPM"
+            list_element <- cbind(t(TPM),
+                                  ogset@spec1_colData)
+            list_element$gene <- gene_id
+            genes_list[[gene_id]] <- list_element
+        } else if(gene_id %in% rownames(ogset@spec2_exp)) {
+            TPM <- ogset@spec2_exp[gene_id, ]
+            rownames(TPM) <- "TPM"
+            list_element <- cbind(t(TPM),
+                                  ogset@spec2_colData)
+            list_element$gene <- gene_id
+            genes_list[[gene_id]] <- list_element
+        }
+    }
+
+    genes_list <- do.call(rbind, genes_list)
+
+    p_out <- ggplot2::ggplot(data = genes_list,
+                             ggplot2::aes_string(x = ogset@exp_cond,
+                                                 y = "TPM")) +
+        ggplot2::geom_jitter(width = .1,
+                             height = 0) +
+        ggplot2::stat_summary(fun.y = stats::median,
+                              ggplot2::aes(group = 1),
+                              geom= "line",
+                              lty = 2) +
+        ggplot2::xlab(label = "Condition") +
+        ggplot2::labs(caption = top_info) +
+        ggplot2::facet_wrap(~ gene,
+                            scales = "free_y") +
+        ggplot2::theme_bw()
+    return(p_out)
+}
 
 #' Plot an Histogram of Orthogroup Dimension
 #'
