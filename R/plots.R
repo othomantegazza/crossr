@@ -133,7 +133,8 @@ ggplot_all_stages <- function(orthogroups,
                                     sep = "\n")
         }
     }
-    dset$ogroup <- as.factor(dset$ogroup)
+    dset$ogroup <- factor(dset$ogroup,
+                          levels = unique(dset$ogroup))
     p_out <- ggplot2::ggplot(data = dset,
                              ggplot2::aes_string(x = condition_var,
                                                  y = "TPM",
