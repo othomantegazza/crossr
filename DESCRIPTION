@@ -1,6 +1,6 @@
 Package: crossr
 Title: Functions For Cross Species Quantitative Transcriptomics
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: person("Otho", "Mantegazza", email = "otho.mantegazza@gmail.com",
 				          role = c("aut", "cre"))
 Description: Functions that constitute a simple workflow for cross species
