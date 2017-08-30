@@ -41,7 +41,7 @@ sum_groups <- function(eset, ogroups, mc.cores = 1)
 #'
 #' @export
 
-collapse_orthologs <- function(og_set, mc.cores)
+collapse_orthologs <- function(og_set, mc.cores = 1)
 {
     if(sum(dim(og_set@spec1_exp)) == 0 |
        sum(dim(og_set@spec2_exp)) == 0 |
