@@ -279,3 +279,47 @@ explore_ogroups <- function(groups, main = "dimension of orthogroups")
          xlab = "genes per group", main = main)
     graphics::grid()
 }
+
+#' Returns a Tidy Dataset in Long Format with the Expression, Statistics and
+#' Metadata for Selected Orthogoups
+#'
+#' The long dataset format provided by \code{get_df} can be used straight away to plot orthogroup
+#' expression with \code{ggplot2}.
+#'
+#' @param ogset The \code{ogset} class element that contains the expression data.
+#' @param orthogroups The ortogroups for which we want to extract expression data
+#' @param rank_stat The ranking statistics that we want to extract, defaults to \code{NULL}.
+#' @param use_annos Should functional annotations be included in the dataset? Defaults to \code{FALSE}.
+
+get_df <- function(ogset,
+                   orthogroups,
+                   rank_stat = NULL,
+                   use_annos = FALSE)
+{
+    if (use_annos) {
+        if (nrow(ogset@og_annos) == 0) {
+            stop("the og_annos slot is empty,
+                 please provide functional annotations in og_annos slot of ogset or set use_annos = FALSE")
+        }
+    }
+    if (!is.null(rank_stat)) {
+        if (nrow(ogset@stats) == 0) {
+            stop("the stats slot is empty,
+                 please, estimate statistics on your ogset element with add_fit() or set rank_stat to NULL")
+        }
+        else if (! rank_stat %in% colnames(ogset@stats))
+            stop("the ranking statistic provided must match one of the elements in the design slot")
+    }
+
+    dset <- ogset@og_exp
+    dset <- lapply(orthogroups, function(i) {
+        dat <- cbind(t(dset[i, ]), ogset@colData)
+        colnames(dat)[1] <- "TPM"
+        dat$ogroup <- i
+        if (!is.null(rank_stat)) {dat$f_val <- ogset@stats[i, rank_stat]}
+        if (use_annos) {dat$name <- ogset@og_annos[i, 1]}
+        return(dat)
+    })
+    dset <- do.call(rbind, dset)
+    return(dset)
+}

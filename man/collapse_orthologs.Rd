@@ -4,7 +4,7 @@
 \alias{collapse_orthologs}
 \title{Sum Expression of Orthologs in an ogset class elements}
 \usage{
-collapse_orthologs(og_set, mc.cores)
+collapse_orthologs(og_set, mc.cores = 1)
 }
 \arguments{
 \item{og_set}{a \code{ogset} class element}
