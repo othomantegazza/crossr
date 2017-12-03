@@ -173,6 +173,9 @@ plot_og_genes <- function(ogroup,
                           ogset,
                           ylab = "TPM")
 {
+    if(is.null(ogset@exp_cond)) {stop("ogset@exp_cond is empty, please supply the name of
+                                      the variable that encodes for the experimental condition in coldata into
+                                      the exp_cond slot of ogset")}
     genes <- ogset@og[[ogroup]]
     print(paste("the ", ogroup, " orthogroup contains ", length(genes), " genes: ",
                 paste(genes, collapse = ", "),
@@ -256,8 +259,7 @@ ggplot_ogroup_genes <- function(orthogroup,
                               lty = 2) +
         ggplot2::xlab(label = "Condition") +
         ggplot2::labs(caption = top_info) +
-        ggplot2::facet_wrap(~ gene,
-                            scales = "free_y") +
+        ggplot2::facet_wrap(~ gene) +
         ggplot2::theme_bw()
     return(p_out)
 }
@@ -312,6 +314,7 @@ get_df <- function(ogset,
     }
 
     dset <- ogset@og_exp
+
     dset <- lapply(orthogroups, function(i) {
         dat <- cbind(t(dset[i, ]), ogset@colData)
         colnames(dat)[1] <- "TPM"
@@ -322,4 +325,16 @@ get_df <- function(ogset,
     })
     dset <- do.call(rbind, dset)
     return(dset)
+}
+
+#' For all Genes in One Orthogroup, Returns a Tidy Dataset in Long Format with the Expression,
+#' Statistics and Metadata
+
+get_gene_df <- function(ogset,
+                        orthogroup)
+{
+    if(is.null(ogset@exp_cond)) {stop("ogset@exp_cond is empty, please supply the name of
+                                      the variable that encodes for the experimental condition in coldata into
+                                      the exp_cond slot of ogset")}
+    return(NULL)
 }

@@ -5,12 +5,12 @@
 \title{Returns a Tidy Dataset in Long Format with the Expression, Statistics and
 Metadata for Selected Orthogoups}
 \usage{
-get_df(ogset, ogroups, rank_stat = NULL, use_annos = FALSE)
+get_df(ogset, orthogroups, rank_stat = NULL, use_annos = FALSE)
 }
 \arguments{
 \item{ogset}{The \code{ogset} class element that contains the expression data.}
 
-\item{ogroups}{The ortogroups for which we want to extract expression data}
+\item{orthogroups}{The ortogroups for which we want to extract expression data}
 
 \item{rank_stat}{The ranking statistics that we want to extract, defaults to \code{NULL}.}
 
