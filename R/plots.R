@@ -329,6 +329,11 @@ get_df <- function(ogset,
 
 #' For all Genes in One Orthogroup, Returns a Tidy Dataset in Long Format with the Expression,
 #' Statistics and Metadata
+#'
+#' NOTE the function returns NULL, still writing it.
+#'
+#' @param ogset The \code{ogset} class element that contains the expression data.
+#' @param orthogroup The ortogroups for which we want to extract expression data
 
 get_gene_df <- function(ogset,
                         orthogroup)
