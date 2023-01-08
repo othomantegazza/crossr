@@ -25,7 +25,7 @@ those packages must be installed in R.
 If you haven't installed *ggplot2* and *pheatmap* already, you can install them by typing:
 
 ```r
-install.packages("ggplot2", "pheatmap")
+install.packages(c("ggplot2", "pheatmap"))
 ```
 
 Then you can use *devtools* to install *crossr* by typing:
